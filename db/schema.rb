@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_03_210009) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_03_210010) do
   create_table "activity_levels", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -23,6 +23,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_03_210009) do
   end
 
   create_table "dish_components", force: :cascade do |t|
+    t.boolean "assembled_fresh", default: false, null: false
     t.datetime "created_at", null: false
     t.integer "dish_id", null: false
     t.decimal "grams", precision: 8, scale: 2
@@ -38,13 +39,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_03_210009) do
   create_table "dishes", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "equipment"
-    t.boolean "freezable", default: true, null: false
     t.string "key", null: false
     t.string "letter", null: false
     t.string "name", null: false
     t.string "season", null: false
     t.json "steps", default: [], null: false
     t.string "storage"
+    t.string "storage_mode", default: "frais", null: false
     t.text "summary"
     t.datetime "updated_at", null: false
     t.integer "week_number", null: false

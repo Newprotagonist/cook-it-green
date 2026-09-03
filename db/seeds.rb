@@ -38,23 +38,26 @@ DEF["plats"].each do |row|
   overlap = row["base"].keys & row["leviers"]
   raise "#{row['id']} : #{overlap.inspect} à la fois en base et en levier" if overlap.any?
 
+  fresh = row["montage_frais"] || []
   dish = Dish.find_or_initialize_by(key: row["id"])
   dish.assign_attributes(
     season: row["saison"], week_number: row["semaine"], letter: row["lettre"],
     name: row["nom"], summary: row["resume"], steps: row["etapes"],
-    storage: row["conservation"], freezable: row["congelable"], equipment: row["materiel"]
+    storage: row["conservation"],
+    storage_mode: fresh.any? ? "assemblage" : (row["congelable"] ? "congelable" : "frais"),
+    equipment: row["materiel"]
   )
   dish.save!(validate: false)
   dish.dish_components.destroy_all
 
   position = 0
   row["base"].each do |key, grams|
-    dish.dish_components.create!(ingredient: Ingredient.find_by!(key: key),
-                                grams: grams, role: "base", position: position += 1)
+    dish.dish_components.create!(ingredient: Ingredient.find_by!(key: key), grams: grams,
+                                role: "base", position: position += 1, assembled_fresh: fresh.include?(key))
   end
   row["leviers"].each do |key|
     dish.dish_components.create!(ingredient: Ingredient.find_by!(key: key),
-                                role: "lever", position: position += 1)
+                                role: "lever", position: position += 1, assembled_fresh: fresh.include?(key))
   end
   dish.reload.validate! # les 3 leviers, maintenant que les composants existent
 end

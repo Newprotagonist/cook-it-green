@@ -133,11 +133,17 @@ module Menu
       steps << Step.new(time: "2:00 → 2:35", duration: "35 min", title: "Plat 3 : #{rest[1]&.name}", actions: [
         "Dernier plat, celui qui demande le moins de cuisson passive.",
         "Préparer en parallèle les sauces et vinaigrettes de la semaine, à stocker en pots séparés." ])
-      steps << Step.new(time: "2:35 → 3:00", duration: "25 min", title: "Refroidissement, pesée & étiquetage", actions: [
+      cooling = [
         "Étaler les plats sur des plaques froides 15 min : refroidir vite est la première règle de sécurité alimentaire (moins de 2 h entre 63 °C et 10 °C).",
         "Peser les portions à la balance : #{portions['F']} portions du plat frais, #{portions['A']} et #{portions['B']} pour les deux autres. C'est la pesée, pas la recette, qui garantit les macros.",
         "Étiqueter chaque boîte : nom du plat, date, et « FRIGO » ou « CONGÉL ».",
-        "Mettre au congélateur les portions des trois derniers jours de la semaine, et les garnitures croquantes dans des bocaux à part." ])
+        "Mettre au congélateur les portions des trois derniers jours de la semaine, et les garnitures croquantes dans des bocaux à part."
+      ]
+      roles.values.select(&:assembly?).each do |d|
+        names = d.fresh_components.map { |c| c.ingredient.name }.join(", ")
+        cooling << "#{d.name} : réserver #{names} à part, à ajouter frais à chaque service — jamais au congélateur."
+      end
+      steps << Step.new(time: "2:35 → 3:00", duration: "25 min", title: "Refroidissement, pesée & étiquetage", actions: cooling)
       steps
     end
 

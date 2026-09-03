@@ -131,19 +131,17 @@ Commit initial `c187327` (170 fichiers). L'app tourne en local, 112 journées va
 **Non committé :** les 6 fichiers de test et la modification de `test/test_helper.rb`.
 C'est la première chose à faire.
 
-### Défaut connu — semaine 12
+### Corrigé — semaine 12 (état « plat d'assemblage »)
 
-La salade niçoise (`E12C`, 3 jours au frais, non congelable) est programmée vendredi,
-samedi et dimanche, soit jusqu'à J+7 après la session. L'été compte 5 plats non
-congelables pour 4 semaines : par principe des tiroirs, une semaine en porte forcément
-deux, et le second déborde sur le week-end. Aucune permutation ne corrige ça.
+La salade niçoise (`E12C`) était programmée jusqu'au dimanche (J+7) alors qu'elle n'était
+garantie que 3 jours au frais et marquée non congelable — l'été comptait 5 plats non
+congelables pour 4 semaines, donc une semaine en portait forcément deux.
 
-`Menu::InvariantTest::KNOWN_STORAGE_VIOLATIONS` fige la liste à cette seule occurrence :
-si un autre plat s'y ajoute, la suite rougit.
-
-Trois sorties possibles : rendre une recette d'été congelable, introduire un troisième
-état « plat d'assemblage » (composants qui se conservent, montage à la minute — c'est ce
-que sont réellement ces salades), ou réécrire une recette d'été en version congelable.
+Correction : `dishes.storage_mode` (`congelable` / `frais` / `assemblage`) remplace
+l'ancien booléen `freezable`. E12C passe en `assemblage` — tout le plat se congèle sauf
+l'avocat (`dish_components.assembled_fresh`), ajouté frais à chaque service. `Dish#freezable?`
+reste vrai pour ce mode, donc `Menu::Week#roles` la traite comme congelable sans changement
+de logique. `Menu::InvariantTest::KNOWN_STORAGE_VIOLATIONS` est repassé à `[]`.
 
 ### Fils ouverts
 

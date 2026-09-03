@@ -98,15 +98,16 @@ class Menu::InvariantTest < MenuTestCase
   # rôle F, seul rôle dont les jours s'arrêtent au jeudi. Les rôles A et B
   # atteignent le dimanche, soit J+7, et supposent un passage au congélateur.
   #
-  # DÉFAUT CONNU — semaine 12. L'été compte 5 plats non congelables pour
-  # 4 semaines : par principe des tiroirs, une semaine en porte forcément deux,
-  # et le second déborde sur le week-end. La salade niçoise (3 jours au frais)
-  # s'y retrouve programmée jusqu'à J+7. Aucune permutation ne le corrige ;
-  # il faut soit rendre une recette d'été congelable, soit introduire un
-  # troisième état « plat d'assemblage », soit réécrire une recette.
+  # CORRIGÉ — semaine 12. L'été comptait 5 plats non congelables pour
+  # 4 semaines : par principe des tiroirs, une semaine en portait forcément
+  # deux, et le second débordait sur le week-end. La salade niçoise (E12C)
+  # est en réalité un « plat d'assemblage » : tout se congèle sauf l'avocat,
+  # ajouté frais à chaque service (`Dish::STORAGE_MODES`, `storage_mode:
+  # "assemblage"`). Elle compte donc à nouveau comme congelable pour le
+  # placement, et la liste des violations retombe à vide.
   #
   # Ce test verrouille l'existant : la liste ne doit pas s'allonger.
-  KNOWN_STORAGE_VIOLATIONS = [ "semaine 12 : E12C en rôle A" ].freeze
+  KNOWN_STORAGE_VIOLATIONS = [].freeze
 
   test "un plat non congelable ne déborde pas sur le week-end" do
     violations = Dish.distinct.pluck(:week_number).sort.flat_map do |number|

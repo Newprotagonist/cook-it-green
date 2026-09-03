@@ -79,6 +79,16 @@ class Menu::WeekTest < MenuTestCase
     assert_equal %w[Vendredi Samedi Dimanche], week.days.select(&:from_freezer).map(&:name)
   end
 
+  test "un plat d'assemblage se congèle sauf son composant frais" do
+    dish = Dish.find_by!(key: "E12C")
+    week = Menu::Week.new(target, dish.week_number)
+
+    assert dish.assembly?
+    assert dish.freezable?, "un plat d'assemblage compte comme congelable pour le placement"
+    assert_not_equal "F", week.roles.key(dish), "il n'a plus besoin du rôle F"
+    assert_match(/réserver avocat/i, week.batch_plan.last.actions.join(" "))
+  end
+
   test "jamais deux fois le même plat dans une journée" do
     Dish.distinct.pluck(:week_number).each do |number|
       Menu::Week.new(target, number).days.each do |day|
