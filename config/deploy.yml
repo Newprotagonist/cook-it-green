@@ -1,0 +1,57 @@
+# GABARIT — NON DÉPLOYÉ.
+# Les valeurs entre <> restent à remplir une fois le nom de domaine choisi.
+# Ne lancer `bin/kamal setup` qu'après avoir : acheté le domaine, pointé son A record
+# vers l'IP du serveur, et démarré le démon Docker (Kamal construit l'image en local).
+
+service: batch-cooking
+
+# Sur un registre externe, le chemin DOIT être owner/app-name : un nom d'app seul
+# échoue silencieusement au push.
+image: <utilisateur-github>/batch-cooking
+
+servers:
+  web:
+    - <ip-du-serveur>
+
+proxy:
+  ssl: true
+  host: <domaine.tld>          # Let's Encrypt est automatique une fois le DNS résolu
+
+registry:
+  server: ghcr.io
+  username: <utilisateur-github>
+  password:
+    - KAMAL_REGISTRY_PASSWORD  # PAT GitHub classique, scope write:packages
+
+env:
+  clear:
+    # Solid Queue tourne dans le process Puma : à cette échelle, un serveur de jobs
+    # séparé n'apporte rien.
+    SOLID_QUEUE_IN_PUMA: true
+  secret:
+    - RAILS_MASTER_KEY
+    - BASIC_AUTH_USER
+    - BASIC_AUTH_PASSWORD
+
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell: app exec --interactive --reuse "bash"
+  logs: app logs -f
+  dbc: app exec --interactive --reuse "bin/rails dbconsole"
+
+# SQLite et Active Storage vivent sur un volume persistant.
+#
+# À FAIRE AVANT LA MISE EN LIGNE — sauvegarde hors serveur.
+# Sur le projet précédent, ce point a été reporté puis oublié : un volume Docker
+# sur un VPS unique n'est pas une sauvegarde. Prévoir un dump SQLite chiffré vers
+# un stockage compatible S3, planifié, et une restauration testée au moins une fois.
+volumes:
+  - "batch_cooking_storage:/rails/storage"
+
+asset_path: /rails/public/assets
+
+builder:
+  arch: arm64
+
+# ssh:
+#   user: root

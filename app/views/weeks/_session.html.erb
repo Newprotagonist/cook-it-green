@@ -1,0 +1,20 @@
+<p class="mb-6 max-w-3xl border-l-2 border-stone-900 pl-4 text-sm text-stone-600">
+  Trois heures, trois plats, quatorze portions. L'ordre compte : ce qui cuit sans surveillance part en premier.
+</p>
+
+<ol class="ml-1.5 border-l-2 border-stone-200">
+  <% week.batch_plan.each do |step| %>
+    <li class="relative grid gap-5 pb-7 pl-6 sm:grid-cols-[7rem_1fr]">
+      <span class="absolute -left-[7px] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-stone-900"></span>
+      <p class="text-xs font-semibold tabular-nums text-stone-900">
+        <%= step.time %><br><span class="font-normal text-stone-400"><%= step.duration %></span>
+      </p>
+      <div>
+        <h3 class="font-semibold"><%= step.title %></h3>
+        <ul class="mt-2 list-disc space-y-1.5 pl-5 text-sm text-stone-600">
+          <% step.actions.each do |action| %><li><%= action %></li><% end %>
+        </ul>
+      </div>
+    </li>
+  <% end %>
+</ol>

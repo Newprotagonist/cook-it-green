@@ -1,0 +1,12 @@
+production: &production
+  freezer_reminder:
+    class: Reminders::FreezerJob
+    queue: default
+    schedule: every day at 6pm
+  batch_session_reminder:
+    class: Reminders::BatchSessionJob
+    queue: default
+    schedule: every saturday at 10am
+
+development:
+  <<: *production

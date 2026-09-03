@@ -1,0 +1,45 @@
+<% content_for :title, "Les 16 semaines" %>
+
+<div class="mb-8">
+  <p class="text-xs uppercase tracking-widest text-stone-400">Rotation annuelle</p>
+  <h1 class="mt-1 text-3xl font-semibold tracking-tight">Seize semaines, quatre saisons</h1>
+  <p class="mt-2 max-w-2xl text-stone-600">
+    Trois plats par semaine, interchangeables entre midi et soir. Nous sommes en
+    <strong><%= Menu::Calendar.label_for(@season).downcase %></strong><% if @current_week %>,
+    semaine <strong><%= @current_week %></strong> de la rotation<% end %>.
+    Prochaine session de batch : <strong><%= l Menu::Calendar.next_batch_session, format: :long %></strong>.
+  </p>
+</div>
+
+<% unless @target&.resolved? %>
+  <p class="mb-6 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+    Aucune cible résolue pour l'instant.
+    <%= link_to "Lancez un recalcul", nutrition_targets_path, class: "underline" %> pour générer les grammages.
+  </p>
+<% end %>
+
+<% @weeks_by_season.each do |season, numbers| %>
+  <section class="mb-10">
+    <h2 class="mb-3 text-sm font-semibold uppercase tracking-widest text-stone-500">
+      <%= Menu::Calendar.label_for(season) %>
+    </h2>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <% numbers.each do |number| %>
+        <%= link_to week_path(number),
+              class: "block rounded border p-4 transition hover:border-stone-400 #{number == @current_week ? 'border-stone-900 bg-white' : 'border-stone-200 bg-white'}" do %>
+          <p class="flex items-baseline justify-between">
+            <span class="font-semibold">Semaine <%= number %></span>
+            <% if number == @current_week %>
+              <span class="rounded bg-stone-900 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white">en cours</span>
+            <% end %>
+          </p>
+          <ul class="mt-2 space-y-1 text-sm text-stone-600">
+            <% (@dishes_by_week[number] || []).each do |dish| %>
+              <li class="line-clamp-1"><%= dish.name %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+    </div>
+  </section>
+<% end %>

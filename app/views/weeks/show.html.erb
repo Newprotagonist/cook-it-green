@@ -1,0 +1,33 @@
+<% content_for :title, "Semaine #{@week.number}" %>
+<% avg = @week.averages %>
+
+<div class="mb-6 flex flex-wrap items-baseline justify-between gap-4">
+  <div>
+    <p class="text-xs uppercase tracking-widest text-stone-400">
+      <%= Menu::Calendar.label_for(@week.season) %>
+    </p>
+    <h1 class="mt-1 text-3xl font-semibold tracking-tight">Semaine <%= @week.number %></h1>
+  </div>
+  <p class="text-xs tabular-nums text-stone-500">
+    Moyenne du jour : <%= kcal avg.kcal %> kcal ·
+    P <%= grams avg.protein %> · L <%= grams avg.lipid %> ·
+    G <%= grams avg.carb %> · F <%= grams avg.fiber %>
+  </p>
+</div>
+
+<% if (short = @week.shortfalls).any? %>
+  <p class="mb-6 rounded border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
+    <%= short.size %> journée(s) sous un minimum :
+    <%= short.map { |d| "#{d.name} (#{d.totals.shortfalls(@target.macro_minimums).join(', ')})" }.to_sentence %>.
+  </p>
+<% end %>
+
+<nav class="mb-6 flex flex-wrap gap-2">
+  <% { "planning" => "Planning", "plats" => "Plats & recettes",
+       "courses" => "Liste de courses", "session" => "Session de 3 h" }.each do |key, label| %>
+    <%= link_to label, week_path(@week.number, view: key),
+          class: "rounded border px-4 py-1.5 text-sm #{@view == key ? 'border-stone-900 bg-stone-900 text-white' : 'border-stone-300 text-stone-600 hover:border-stone-500'}" %>
+  <% end %>
+</nav>
+
+<%= render "weeks/#{@view}", week: @week, target: @target %>

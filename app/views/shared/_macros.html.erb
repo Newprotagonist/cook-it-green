@@ -1,0 +1,9 @@
+<dl class="flex flex-wrap divide-x divide-stone-200 rounded border border-stone-200 bg-white text-sm">
+  <% [["kcal", kcal(macros.kcal)], ["Protéines", grams(macros.protein)], ["Lipides", grams(macros.lipid)],
+      ["Glucides", grams(macros.carb)], ["Fibres", grams(macros.fiber)]].each do |label, value| %>
+    <div class="flex-1 px-4 py-2">
+      <dt class="text-[10px] uppercase tracking-wider text-stone-400"><%= label %></dt>
+      <dd class="tabular-nums font-medium"><%= value %></dd>
+    </div>
+  <% end %>
+</dl>

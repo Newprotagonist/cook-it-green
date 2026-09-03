@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title><%= content_for(:title) || "Batch cooking" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1c1917">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+    <% if (vapid = Rails.application.credentials.dig(:vapid, :public_key)) %>
+      <%= tag.meta name: "vapid-public-key", content: vapid %>
+    <% end %>
+
+    <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <%= tag.link rel: "icon", href: versioned_icon_path("icon-192.png"), type: "image/png" %>
+    <%= tag.link rel: "apple-touch-icon", href: versioned_icon_path("apple-touch-icon.png") %>
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-stone-50 text-stone-900 antialiased">
+    <header class="border-b border-stone-200 bg-white">
+      <nav class="mx-auto flex max-w-6xl flex-wrap items-baseline gap-x-6 gap-y-2 px-5 py-4">
+        <%= link_to "Batch cooking", root_path, class: "font-semibold tracking-tight" %>
+        <div class="flex gap-5 text-sm text-stone-600">
+          <%= link_to "Semaines", weeks_path, class: "hover:text-stone-900" %>
+          <%= link_to "Profil & besoins", profile_path, class: "hover:text-stone-900" %>
+          <%= link_to "Cibles", nutrition_targets_path, class: "hover:text-stone-900" %>
+        </div>
+        <% if (t = NutritionTarget.current) %>
+          <span class="ml-auto text-xs tabular-nums text-stone-500">
+            <%= t.name %> · <%= kcal t.floor_kcal %> kcal ·
+            P<%= t.protein.to_i %> L<%= t.lipid.to_i %> G<%= t.carb.to_i %> F<%= t.fiber.to_i %>
+            <% unless t.resolved? %><span class="text-amber-600">· non résolue</span><% end %>
+          </span>
+        <% end %>
+      </nav>
+    </header>
+
+    <% if flash[:notice] || flash[:alert] %>
+      <div class="mx-auto max-w-6xl px-5 pt-4">
+        <% if flash[:notice] %>
+          <p class="rounded border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-900"><%= flash[:notice] %></p>
+        <% end %>
+        <% if flash[:alert] %>
+          <p class="rounded border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900"><%= flash[:alert] %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <main class="mx-auto max-w-6xl px-5 py-8"><%= yield %></main>
+
+    <footer class="mx-auto max-w-6xl px-5 py-10 text-xs leading-relaxed text-stone-500">
+      Convention française : glucides hors fibres, kcal = 4P + 9L + 4G + 2F.
+      Valeurs Ciqual 2020 / USDA. Ce plan n'est pas un avis médical.
+    </footer>
+  </body>
+</html>

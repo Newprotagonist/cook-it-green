@@ -1,0 +1,21 @@
+{
+  "name": "Batch cooking",
+  "short_name": "Batch",
+  "description": "Menu végétalien annuel calibré au gramme, en batch cooking.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAFAF9",
+  "theme_color": "#1C1917",
+  "lang": "fr",
+  "icons": [
+    { "src": "<%= versioned_icon_path('icon-192.png') %>", "type": "image/png", "sizes": "192x192" },
+    { "src": "<%= versioned_icon_path('icon-512.png') %>", "type": "image/png", "sizes": "512x512" },
+    { "src": "<%= versioned_icon_path('icon-512-maskable.png') %>", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Semaine en cours", "url": "/weeks/<%= Menu::Calendar.current_week_number || 1 %>" },
+    { "name": "Liste de courses", "url": "/weeks/<%= Menu::Calendar.current_week_number || 1 %>?view=courses" }
+  ]
+}

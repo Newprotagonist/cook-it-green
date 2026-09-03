@@ -1,0 +1,100 @@
+# Batch cooking
+
+Menu végétalien annuel calibré au gramme, en batch cooking : 16 semaines de rotation,
+48 plats, une session de cuisine de 3 h par semaine. PWA mono-utilisateur.
+
+Le nom définitif reste à choisir — `batch_cooking` est provisoire.
+
+## Le principe
+
+Midi et soir visent **la même cible** de macronutriments, ce qui rend les trois plats
+d'une semaine totalement interchangeables. Chaque recette a une base fixe (légumes,
+aromates, matière grasse de cuisson) et **trois leviers** — un apport protéique, un
+apport glucidique et une matière grasse — dont un solveur détermine le grammage.
+
+Rien n'est figé : les cibles, leur répartition sur la journée, les constantes du calcul
+des besoins, les bornes de grammage et la rotation hebdomadaire sont **des enregistrements
+en base**. Changer d'objectif se fait dans l'interface, puis un recalcul régénère les
+48 plats et les 24 recettes fixes en ~800 ms.
+
+## Convention nutritionnelle
+
+Convention française, celle des étiquettes européennes : **les glucides sont donnés hors
+fibres**, et `kcal = 4P + 9L + 4G + 2F`. Valeurs Ciqual 2020 (ANSES) et USDA FoodData Central.
+
+## Démarrer en local
+
+```bash
+bin/setup          # bundle, base, seeds
+bin/dev            # Puma + Tailwind en watch, sur http://localhost:3000
+```
+
+Identifiants de développement dans `.env` (non versionné) : `batch` / `cooking`.
+
+Le seed charge `db/seeds/menu_definitions.json` : 127 ingrédients, 48 plats,
+6 recettes fixes, la rotation et les tables de référence. Il est idempotent.
+
+Après le seed, aller sur `/cibles` et lancer **Recalculer les 16 semaines** :
+sans cela, aucun grammage n'existe et les écrans de semaine renvoient vers les cibles.
+
+## Architecture
+
+```
+app/services/nutrition/macros.rb            objet-valeur, kcal dérivées
+app/services/nutrition/solver.rb            recherche exhaustive bornée, pénalité asymétrique
+app/services/nutrition/needs_calculator.rb  Mifflin-St Jeor / Katch-McArdle
+app/services/menu/resolver.rb               applique le solveur à une recette
+app/services/menu/recalculator.rb           les 48 plats + 24 recettes fixes, persistés
+app/services/menu/week.rb                   planning, liste de courses, session de 3 h
+app/services/menu/calendar.rb               place une date dans la rotation
+```
+
+Le solveur parcourt **toute** la grille des grammages admissibles au pas de 5 g plutôt
+que de résoudre un système linéaire : l'espace est assez petit pour ça, et l'optimum
+est garanti même quand un levier sature sa borne — cas où une résolution linéaire
+produit des solutions absurdes (glucides à +46 g sur un seul plat).
+
+Les cibles sont des **minimums** : passer dessous est bien plus grave que dépasser,
+d'où la pénalité ×40 sur les écarts négatifs.
+
+## Ce qui vient du pattern « Rails single-user PWA »
+
+Extrait de Move the Spark et réappliqué ici :
+
+- **Pas de système de comptes** : ni modèle `User`, ni Devise. Un identifiant partagé
+  protège l'app via `http_basic_authenticate_with`, gardé par la présence de
+  `ENV["BASIC_AUTH_USER"]` et non par `Rails.env.production?`, pour que le même chemin
+  de code soit exerçable en local. Les routes internes à Rails (`/up`, manifeste,
+  service worker) n'héritent pas d'`ApplicationController` et restent joignables.
+- **Versionnage des icônes** : `ApplicationHelper::ICON_VERSION` ajouté en `?v=N` à
+  chaque URL d'icône. Sans lui, les icônes mises à jour n'atteignent jamais les caches
+  du navigateur, de l'OS, ni les notifications déjà envoyées.
+- **Exclusions `/up`** sur `force_ssl` et `host_authorization` : Kamal interroge la sonde
+  en HTTP simple depuis le réseau Docker privé, un 301 casse le déploiement sans coupure.
+- **Sources SVG rasterisées** avec `rsvg-convert`, badge monochrome sur fond transparent
+  (Android le teinte lui-même).
+
+### Un écart assumé
+
+Le pattern prescrit la gem `webpush`. Elle n'est plus maintenue et sa génération de clés
+VAPID échoue sur OpenSSL 3 (`pkeys are immutable`). Ce projet utilise **`web-push`**,
+le successeur maintenu — même API, namespace `WebPush`.
+
+## Notifications
+
+Deux rappels, diffusés à tous les appareils enregistrés :
+
+| Job | Quand | Contenu |
+|---|---|---|
+| `Reminders::FreezerJob` | tous les jours à 18 h | sortir du congélateur les portions du lendemain |
+| `Reminders::BatchSessionJob` | samedi à 10 h | session du lendemain, plats, et trempages à lancer le soir |
+
+Clés VAPID dans les credentials chiffrés, sous `vapid:`.
+
+## Déploiement
+
+**Rien n'est déployé.** `config/deploy.yml` est un gabarit : domaine, IP et compte de
+registre restent à remplir. Ne pas lancer `bin/kamal setup` avant d'avoir choisi le
+domaine, pointé son DNS, et démarré le démon Docker — Kamal construit l'image localement.
+
+Point ouvert avant toute mise en ligne : **la sauvegarde hors serveur** du volume SQLite.

@@ -1,0 +1,58 @@
+<% content_for :title, @dish.name %>
+
+<p class="text-xs uppercase tracking-widest text-stone-400">
+  <%= Menu::Calendar.label_for(@dish.season) %> · semaine <%= @dish.week_number %> · plat <%= @dish.letter %>
+</p>
+<h1 class="mt-1 text-3xl font-semibold tracking-tight"><%= @dish.name %></h1>
+<p class="mt-2 max-w-2xl text-stone-600"><%= @dish.summary %></p>
+
+<% if @resolved %>
+  <div class="mt-5 max-w-3xl"><%= render "shared/macros", macros: @resolved.macros %></div>
+  <p class="mt-2 text-xs text-stone-500">
+    Écart à la cible : P <%= number_with_precision @resolved.protein_deviation, precision: 1 %> ·
+    L <%= number_with_precision @resolved.lipid_deviation, precision: 1 %> ·
+    G <%= number_with_precision @resolved.carb_deviation, precision: 1 %>
+  </p>
+<% else %>
+  <p class="mt-5 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+    Ce plat n'a pas encore été résolu pour la cible active.
+  </p>
+<% end %>
+
+<div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)]">
+  <div>
+    <p class="mb-2 text-[10px] uppercase tracking-widest text-stone-400">Composition</p>
+    <ul class="text-sm">
+      <% @dish.dish_components.each do |c| %>
+        <li class="flex justify-between gap-4 border-b border-dotted border-stone-200 py-1 last:border-0">
+          <span><%= c.ingredient.name %></span>
+          <span class="tabular-nums <%= c.role == 'lever' ? 'font-semibold' : 'text-stone-500' %>">
+            <% if c.role == "lever" %>
+              <%= @resolved ? grams(@resolved.grams[c.ingredient.key]) : "levier" %>
+            <% else %>
+              <%= grams c.grams %>
+            <% end %>
+          </span>
+        </li>
+      <% end %>
+    </ul>
+    <p class="mt-3 text-xs text-stone-500">
+      Les trois <strong>leviers</strong> sont les ingrédients dont le solveur ajuste le grammage :
+      un apport protéique, un apport glucidique et une matière grasse.
+    </p>
+  </div>
+  <div>
+    <p class="mb-2 text-[10px] uppercase tracking-widest text-stone-400">Méthode</p>
+    <ol class="space-y-3 text-sm text-stone-600">
+      <% @dish.steps.each_with_index do |step, i| %>
+        <li class="grid grid-cols-[1.5rem_1fr] gap-3">
+          <span class="pt-0.5 text-xs font-semibold text-stone-400"><%= i + 1 %></span><span><%= step %></span>
+        </li>
+      <% end %>
+    </ol>
+    <p class="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-xs text-stone-500">
+      <span><%= @dish.equipment %></span><span><%= @dish.storage %></span>
+      <span><%= @dish.freezable? ? "Se congèle" : "Ne pas congeler" %></span>
+    </p>
+  </div>
+</div>
