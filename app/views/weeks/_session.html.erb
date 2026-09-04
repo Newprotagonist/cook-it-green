@@ -1,20 +1,58 @@
-<p class="mb-6 max-w-3xl border-l-2 border-stone-900 pl-4 text-sm text-stone-600">
+<p class="mb-6 max-w-3xl border-l-2 border-chloro-700 pl-4 text-sm text-ash-500">
   Trois heures, trois plats, quatorze portions. L'ordre compte : ce qui cuit sans surveillance part en premier.
 </p>
 
-<ol class="ml-1.5 border-l-2 border-stone-200">
+<%# Desktop : frise verticale, inchangée dans sa structure. %>
+<ol class="ml-1.5 hidden border-l-2 border-ash-200 lg:block">
   <% week.batch_plan.each do |step| %>
     <li class="relative grid gap-5 pb-7 pl-6 sm:grid-cols-[7rem_1fr]">
-      <span class="absolute -left-[7px] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-stone-900"></span>
-      <p class="text-xs font-semibold tabular-nums text-stone-900">
-        <%= step.time %><br><span class="font-normal text-stone-400"><%= step.duration %></span>
+      <span class="absolute -left-[7px] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-chloro-700"></span>
+      <p class="text-xs font-semibold tabular-nums text-ash-900">
+        <%= step.time %><br><span class="font-normal text-ash-400"><%= step.duration %></span>
       </p>
       <div>
         <h3 class="font-semibold"><%= step.title %></h3>
-        <ul class="mt-2 list-disc space-y-1.5 pl-5 text-sm text-stone-600">
+        <ul class="mt-2 list-disc space-y-1.5 pl-5 text-sm text-ash-500">
           <% step.actions.each do |action| %><li><%= action %></li><% end %>
         </ul>
       </div>
     </li>
   <% end %>
 </ol>
+
+<%# Mobile : une étape à la fois (2g), l'index courant survit à un rechargement. %>
+<div class="lg:hidden" data-controller="session-wizard"
+     data-session-wizard-storage-key-value="session:<%= week.number %>"
+     data-session-wizard-total-value="<%= week.batch_plan.size %>">
+  <div class="rounded-t-xl bg-chloro-700 px-4 py-3.5">
+    <div class="mb-2.5 flex items-baseline justify-between">
+      <span class="text-sm font-extrabold tracking-tight text-white">Session de 3 h</span>
+      <span data-session-wizard-target="counter" class="text-xs font-semibold tabular-nums text-chloro-200"></span>
+    </div>
+    <div class="flex gap-1">
+      <% week.batch_plan.each_index do |i| %>
+        <span data-session-wizard-target="dot" class="h-[5px] flex-1 rounded-full bg-chloro-900"></span>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="rounded-b-xl border border-t-0 border-ash-200 bg-white">
+    <% week.batch_plan.each do |step| %>
+      <div data-session-wizard-target="panel" hidden class="px-5 py-6">
+        <p class="text-[11px] font-bold uppercase tracking-widest tabular-nums text-chloro-600"><%= step.time %></p>
+        <p class="mt-1 text-[26px] font-extrabold leading-tight tracking-tight text-ash-900"><%= step.title %></p>
+        <span class="mt-3 inline-flex items-center rounded-full bg-chloro-50 px-3.5 py-1.5 text-[13px] font-bold tabular-nums text-chloro-700"><%= step.duration %></span>
+        <ul class="mt-5 list-disc space-y-4 pl-5 text-[17px] leading-relaxed text-ash-900">
+          <% step.actions.each do |action| %><li><%= action %></li><% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="flex gap-2.5 border-t border-ash-200 p-3">
+      <button type="button" data-session-wizard-target="prev" data-action="click->session-wizard#prev"
+              class="h-[52px] w-[52px] flex-none rounded-lg border border-ash-300 text-lg text-ash-500 disabled:opacity-30">‹</button>
+      <button type="button" data-session-wizard-target="next" data-action="click->session-wizard#next"
+              class="h-[52px] flex-1 rounded-lg bg-chloro-700 text-[15px] font-bold text-white disabled:opacity-60"></button>
+    </div>
+  </div>
+</div>

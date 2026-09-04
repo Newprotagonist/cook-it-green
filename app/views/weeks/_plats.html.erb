@@ -2,79 +2,85 @@
   <% %w[F A B].each do |role| %>
     <% dish = week.roles[role] %><% next unless dish %>
     <% resolved = ResolvedDish.find_by(nutrition_target: target, dish: dish) %>
-    <article class="rounded border border-stone-200 bg-white p-6">
-      <p class="text-xs uppercase tracking-widest text-stone-400">
-        Rôle <%= role %> · <%= week.portions[role] %> portions
-      </p>
-      <h2 class="mt-1 text-xl font-semibold tracking-tight">
-        <%= link_to dish.name, dish_path(dish.key), class: "hover:underline" %>
-      </h2>
-      <p class="mt-2 max-w-2xl text-sm text-stone-600"><%= dish.summary %></p>
-      <div class="mt-4"><%= render "shared/macros", macros: resolved.macros %></div>
+    <article class="overflow-hidden rounded-xl border border-ash-200 bg-white">
+      <div class="bg-chloro-900 px-6 py-4">
+        <p class="text-[10px] font-bold uppercase tracking-widest text-chloro-200">
+          Rôle <%= role %> · <%= week.portions[role] %> portions · <%= dish.storage_label %>
+        </p>
+        <h2 class="mt-1.5 text-xl font-extrabold tracking-tight text-white">
+          <%= link_to dish.name, dish_path(dish.key), class: "hover:underline" %>
+        </h2>
+      </div>
+      <div class="p-6">
+        <p class="max-w-2xl text-sm text-ash-500"><%= dish.summary %></p>
+        <div class="mt-4"><%= render "shared/macros", macros: resolved.macros %></div>
 
-      <div class="mt-5 grid gap-8 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
-        <div>
-          <p class="mb-2 text-[10px] uppercase tracking-widest text-stone-400">Pour une portion</p>
-          <ul class="text-sm">
-            <% levers = resolved.lever_keys %>
-            <% resolved.lines.each do |ingredient, g| %>
-              <li class="flex justify-between gap-4 border-b border-dotted border-stone-200 py-1 last:border-0">
-                <span><%= ingredient.name %></span>
-                <span class="tabular-nums <%= levers.include?(ingredient.key) ? 'font-semibold text-stone-900' : 'text-stone-500' %>">
-                  <%= grams g %>
-                </span>
-              </li>
-            <% end %>
-          </ul>
-          <p class="mt-2 text-xs text-stone-500">Multipliez par <strong><%= week.portions[role] %></strong> pour la session.</p>
-        </div>
-        <div>
-          <p class="mb-2 text-[10px] uppercase tracking-widest text-stone-400">Méthode</p>
-          <ol class="space-y-3 text-sm text-stone-600">
-            <% dish.steps.each_with_index do |step, i| %>
-              <li class="grid grid-cols-[1.5rem_1fr] gap-3">
-                <span class="pt-0.5 text-xs font-semibold text-stone-400"><%= i + 1 %></span>
-                <span><%= step %></span>
-              </li>
-            <% end %>
-          </ol>
-          <p class="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-xs text-stone-500">
-            <span><%= dish.equipment %></span><span><%= dish.storage %></span>
-            <span><%= dish.storage_label %></span>
-          </p>
+        <div class="mt-5 grid gap-8 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
+          <div>
+            <p class="mb-2 text-[10px] uppercase tracking-widest text-ash-400">Pour une portion</p>
+            <ul class="text-sm">
+              <% levers = resolved.lever_keys %>
+              <% resolved.lines.each do |ingredient, g| %>
+                <li class="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-dotted border-ash-200 py-1 last:border-0">
+                  <span class="flex items-center gap-1.5">
+                    <%= ingredient.name %>
+                    <% if levers.include?(ingredient.key) %><span class="rounded bg-zest-400 px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-chloro-950">LEVIER</span><% end %>
+                  </span>
+                  <span class="tabular-nums <%= levers.include?(ingredient.key) ? 'font-bold text-chloro-700' : 'text-ash-500' %>">
+                    <%= grams g %>
+                  </span>
+                </li>
+              <% end %>
+            </ul>
+            <p class="mt-2 text-xs text-ash-500">Multipliez par <strong><%= week.portions[role] %></strong> pour la session.</p>
+          </div>
+          <div>
+            <p class="mb-2 text-[10px] uppercase tracking-widest text-ash-400">Méthode</p>
+            <ol class="space-y-3 text-sm text-ash-500">
+              <% dish.steps.each_with_index do |step, i| %>
+                <li class="grid grid-cols-[1.5rem_1fr] gap-3">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-full bg-chloro-50 text-xs font-bold text-chloro-700"><%= i + 1 %></span>
+                  <span><%= step %></span>
+                </li>
+              <% end %>
+            </ol>
+            <p class="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-xs text-ash-500">
+              <span><%= dish.equipment %></span><span><%= dish.storage %></span>
+            </p>
+          </div>
         </div>
       </div>
     </article>
   <% end %>
 
-  <h2 class="pt-4 text-lg font-semibold tracking-tight">Petits-déjeuners & collations de la saison</h2>
+  <h2 class="pt-4 text-lg font-semibold tracking-tight text-ash-900">Petits-déjeuners & collations de la saison</h2>
   <% ResolvedFixedMeal.where(nutrition_target: target, season: week.season)
                       .includes(:fixed_meal).sort_by { |r| [r.fixed_meal.kind, r.fixed_meal.position] }.each do |r| %>
-    <article class="rounded border border-stone-200 bg-white p-6">
-      <p class="text-xs uppercase tracking-widest text-stone-400">
+    <article class="rounded-xl border border-ash-200 bg-white p-6">
+      <p class="text-xs uppercase tracking-widest text-ash-400">
         <%= r.fixed_meal.kind == "breakfast" ? "Petit-déjeuner" : "Collation" %>
       </p>
-      <h3 class="mt-1 text-lg font-semibold tracking-tight"><%= r.fixed_meal.name %></h3>
-      <p class="mt-2 max-w-2xl text-sm text-stone-600"><%= r.fixed_meal.summary %></p>
+      <h3 class="mt-1 text-lg font-semibold tracking-tight text-ash-900"><%= r.fixed_meal.name %></h3>
+      <p class="mt-2 max-w-2xl text-sm text-ash-500"><%= r.fixed_meal.summary %></p>
       <div class="mt-4"><%= render "shared/macros", macros: r.macros %></div>
       <div class="mt-5 grid gap-8 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
         <ul class="text-sm">
           <% r.lines.each do |ingredient, g| %>
-            <li class="flex justify-between gap-4 border-b border-dotted border-stone-200 py-1 last:border-0">
-              <span><%= ingredient.name %></span><span class="tabular-nums text-stone-500"><%= grams g %></span>
+            <li class="flex justify-between gap-4 border-b border-dotted border-ash-200 py-1 last:border-0">
+              <span><%= ingredient.name %></span><span class="tabular-nums text-ash-500"><%= grams g %></span>
             </li>
           <% end %>
         </ul>
         <div>
-          <ol class="space-y-3 text-sm text-stone-600">
+          <ol class="space-y-3 text-sm text-ash-500">
             <% r.fixed_meal.steps.each_with_index do |step, i| %>
               <li class="grid grid-cols-[1.5rem_1fr] gap-3">
-                <span class="pt-0.5 text-xs font-semibold text-stone-400"><%= i + 1 %></span><span><%= step %></span>
+                <span class="pt-0.5 text-xs font-semibold text-ash-400"><%= i + 1 %></span><span><%= step %></span>
               </li>
             <% end %>
           </ol>
           <% if r.fixed_meal.powder_free_variant.present? %>
-            <p class="mt-4 border-l-2 border-stone-900 pl-4 text-sm text-stone-600">
+            <p class="mt-4 border-l-2 border-chloro-700 pl-4 text-sm text-ash-500">
               <strong>Sans poudre protéinée :</strong> <%= r.fixed_meal.powder_free_variant %>
             </p>
           <% end %>

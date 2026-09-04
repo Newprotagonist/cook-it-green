@@ -1,73 +1,73 @@
 <% content_for :title, "Profil & besoins" %>
 
-<p class="text-xs uppercase tracking-widest text-stone-400">Étape 1</p>
-<h1 class="mt-1 text-3xl font-semibold tracking-tight">Vos besoins</h1>
-<p class="mt-2 max-w-2xl text-stone-600">
+<p class="text-xs font-bold uppercase tracking-widest text-chloro-600">Étape 1</p>
+<h1 class="mt-1 text-3xl font-extrabold tracking-tight text-ash-900">Vos besoins</h1>
+<p class="mt-2 max-w-2xl text-ash-500">
   Le calculateur estime le métabolisme de base et la dépense, puis en déduit une répartition.
   Les chiffres restent modifiables à la main : c'est la cible enregistrée qui pilote le menu.
 </p>
 
 <div class="mt-7 grid gap-5 lg:grid-cols-2">
-  <section class="rounded border border-stone-200 bg-white p-6">
-    <h2 class="mb-4 text-[10px] font-semibold uppercase tracking-widest text-stone-500">Profil</h2>
-    <%= form_with model: @profile, url: profile_path, method: :patch, class: "space-y-4" do |f| %>
-      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <label class="block">
-          <span class="text-[10px] uppercase tracking-wider text-stone-400">Sexe biologique</span>
-          <%= f.select :sex, [["Homme", "male"], ["Femme", "female"]], {},
-                class: "mt-1 w-full rounded border border-stone-300 px-2 py-1.5 text-sm" %>
+  <section class="overflow-hidden rounded-xl border border-ash-200 bg-white">
+    <h2 class="border-b border-ash-100 bg-ash-50 px-5 py-3 text-[10px] font-bold uppercase tracking-widest text-ash-500">Profil</h2>
+    <%= form_with model: @profile, url: profile_path, method: :patch do |f| %>
+      <label class="flex min-h-14 items-center justify-between gap-4 border-b border-ash-100 px-5">
+        <span class="text-[15px] text-ash-900">Sexe biologique</span>
+        <%= f.select :sex, [["Homme", "male"], ["Femme", "female"]], {},
+              class: "rounded-lg border border-ash-300 bg-white px-3 py-2 text-right text-[15px] font-semibold text-ash-900 focus:border-chloro-500 focus:outline focus:outline-2 focus:outline-chloro-100" %>
+      </label>
+      <% [[:age, "Âge", "ans"], [:weight_kg, "Poids", "kg"], [:height_cm, "Taille", "cm"],
+          [:body_fat_pct, "Masse grasse (facultatif)", "%"]].each do |field, label, unit| %>
+        <label class="flex min-h-14 items-center justify-between gap-4 border-b border-ash-100 px-5">
+          <span class="text-[15px] text-ash-900"><%= label %></span>
+          <span class="flex items-center gap-2">
+            <%= f.number_field field, step: field == :age ? 1 : 0.5, inputmode: "decimal",
+                  class: "w-24 rounded-lg border border-ash-300 bg-white px-3 py-2 text-right text-[15px] font-semibold tabular-nums text-ash-900 focus:border-chloro-500 focus:outline focus:outline-2 focus:outline-chloro-100" %>
+            <span class="w-6 text-xs font-medium text-ash-400"><%= unit %></span>
+          </span>
         </label>
-        <% [[:age, "Âge", "ans"], [:weight_kg, "Poids", "kg"], [:height_cm, "Taille", "cm"],
-            [:body_fat_pct, "Masse grasse", "% — facultatif"]].each do |field, label, unit| %>
-          <label class="block">
-            <span class="text-[10px] uppercase tracking-wider text-stone-400"><%= label %></span>
-            <%= f.number_field field, step: field == :age ? 1 : 0.5,
-                  class: "mt-1 w-full rounded border border-stone-300 px-2 py-1.5 text-sm tabular-nums" %>
-            <span class="text-[11px] text-stone-400"><%= unit %></span>
-          </label>
-        <% end %>
+      <% end %>
+      <label class="flex min-h-14 items-center justify-between gap-4 border-b border-ash-100 px-5">
+        <span class="text-[15px] text-ash-900">Niveau d'activité</span>
+        <%= f.collection_select :activity_level_id, ActivityLevel.all, :id, :name, {},
+              class: "max-w-[60%] rounded-lg border border-ash-300 bg-white px-3 py-2 text-right text-[15px] font-semibold text-ash-900 focus:border-chloro-500 focus:outline focus:outline-2 focus:outline-chloro-100" %>
+      </label>
+      <p class="border-b border-ash-100 px-5 pb-3 pt-1 text-xs text-ash-400"><%= @profile.activity_level&.description %></p>
+      <label class="flex min-h-14 items-center justify-between gap-4 border-b border-ash-100 px-5">
+        <span class="text-[15px] text-ash-900">Objectif</span>
+        <%= f.collection_select :goal_id, Goal.all, :id, :name, {},
+              class: "max-w-[60%] rounded-lg border border-ash-300 bg-white px-3 py-2 text-right text-[15px] font-semibold text-ash-900 focus:border-chloro-500 focus:outline focus:outline-2 focus:outline-chloro-100" %>
+      </label>
+      <p class="px-5 pb-4 pt-1 text-xs text-ash-400"><%= @profile.goal&.description %></p>
+      <div class="p-5 pt-0">
+        <%= f.submit "Mettre à jour le profil",
+              class: "block w-full rounded-lg bg-chloro-700 px-4 py-3 text-center text-sm font-bold text-white hover:bg-chloro-600 sm:inline-block sm:w-auto sm:py-2" %>
       </div>
-      <div class="grid gap-4 sm:grid-cols-2">
-        <label class="block">
-          <span class="text-[10px] uppercase tracking-wider text-stone-400">Niveau d'activité</span>
-          <%= f.collection_select :activity_level_id, ActivityLevel.all, :id, :name, {},
-                class: "mt-1 w-full rounded border border-stone-300 px-2 py-1.5 text-sm" %>
-          <span class="text-[11px] text-stone-400"><%= @profile.activity_level&.description %></span>
-        </label>
-        <label class="block">
-          <span class="text-[10px] uppercase tracking-wider text-stone-400">Objectif</span>
-          <%= f.collection_select :goal_id, Goal.all, :id, :name, {},
-                class: "mt-1 w-full rounded border border-stone-300 px-2 py-1.5 text-sm" %>
-          <span class="text-[11px] text-stone-400"><%= @profile.goal&.description %></span>
-        </label>
-      </div>
-      <%= f.submit "Mettre à jour le profil",
-            class: "rounded bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700" %>
     <% end %>
   </section>
 
-  <section class="rounded border border-stone-200 bg-white p-6">
-    <h2 class="mb-4 text-[10px] font-semibold uppercase tracking-widest text-stone-500">Estimation</h2>
+  <section class="rounded-xl border border-ash-200 bg-white p-6">
+    <h2 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-ash-500">Estimation</h2>
     <% if @needs %>
-      <dl class="divide-y divide-stone-100 rounded border border-stone-200">
+      <dl class="overflow-hidden rounded-lg border border-ash-200">
         <% [["Méthode", @needs.method_name],
             ["Métabolisme de base", "#{kcal @needs.basal_metabolic_rate} kcal"],
             ["Dépense estimée (× #{@profile.activity_level.factor.to_f.round(3)})", "#{kcal @needs.total_expenditure} kcal"],
             ["Objectif énergétique", "#{kcal @needs.kcal} kcal"],
             ["Protéines cibles", "#{number_with_precision @needs.protein_g_per_kg, precision: 2} g/kg"]].each do |label, value| %>
-          <div class="flex items-baseline justify-between gap-4 bg-stone-50 px-4 py-2">
-            <dt class="text-sm text-stone-600"><%= label %></dt>
-            <dd class="tabular-nums font-medium"><%= value %></dd>
+          <div class="flex items-baseline justify-between gap-4 border-t border-ash-100 bg-ash-50 px-4 py-2 first:border-t-0">
+            <dt class="text-sm text-ash-500"><%= label %></dt>
+            <dd class="tabular-nums font-bold text-ash-900"><%= value %></dd>
           </div>
         <% end %>
       </dl>
 
-      <p class="mt-4 text-sm text-stone-600">
+      <p class="mt-4 text-sm text-ash-500">
         Répartition déduite :
-        <strong class="tabular-nums">P <%= @needs.protein %> g · L <%= @needs.lipid_adjusted %> g ·
+        <strong class="tabular-nums text-ash-900">P <%= @needs.protein %> g · L <%= @needs.lipid_adjusted %> g ·
         G <%= @needs.carb %> g · F <%= @needs.fiber %> g</strong>
       </p>
-      <p class="mt-2 text-xs text-stone-500">
+      <p class="mt-2 text-xs text-ash-500">
         La recommandation protéique de l'objectif (<%= number_with_precision @profile.goal.protein_g_per_kg, precision: 2 %> g/kg,
         base omnivore) est majorée une seule fois de
         ×<%= NutritionSetting.current.plant_protein_multiplier.to_f.round(2) %> — les protéines végétales
@@ -75,9 +75,9 @@
       </p>
 
       <%= button_to "Créer une cible depuis ce profil", from_profile_nutrition_targets_path,
-            class: "mt-5 rounded bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700" %>
+            class: "mt-5 block w-full rounded-lg bg-chloro-700 px-4 py-3 text-center text-sm font-bold text-white hover:bg-chloro-600 sm:inline-block sm:w-auto sm:py-2" %>
     <% else %>
-      <p class="text-sm text-stone-600">
+      <p class="text-sm text-ash-500">
         Renseignez l'âge, le poids, la taille, le niveau d'activité et l'objectif pour obtenir une estimation.
       </p>
     <% end %>
@@ -85,37 +85,37 @@
 </div>
 
 <section class="mt-8">
-  <h2 class="text-lg font-semibold tracking-tight">Cibles enregistrées</h2>
+  <h2 class="text-lg font-semibold tracking-tight text-ash-900">Cibles enregistrées</h2>
   <ul class="mt-3 space-y-2">
     <% @targets.each do |t| %>
-      <li class="flex flex-wrap items-baseline justify-between gap-3 rounded border border-stone-200 bg-white px-4 py-3 text-sm">
+      <li class="flex flex-wrap items-baseline justify-between gap-3 rounded-xl border border-ash-200 bg-white px-4 py-3 text-sm">
         <span>
-          <strong><%= t.name %></strong>
-          <span class="ml-2 tabular-nums text-stone-500">
+          <strong class="text-ash-900"><%= t.name %></strong>
+          <span class="ml-2 tabular-nums text-ash-500">
             <%= kcal t.floor_kcal %> kcal · P<%= t.protein.to_i %> L<%= t.lipid.to_i %> G<%= t.carb.to_i %> F<%= t.fiber.to_i %>
           </span>
         </span>
         <span class="text-xs">
-          <% if t.active? %><span class="rounded bg-stone-900 px-2 py-0.5 text-white">active</span><% end %>
-          <%= link_to "Gérer", nutrition_targets_path, class: "ml-2 underline text-stone-500" %>
+          <% if t.active? %><span class="rounded-full bg-zest-400 px-2.5 py-0.5 font-bold text-chloro-950">active</span><% end %>
+          <%= link_to "Gérer", nutrition_targets_path, class: "ml-2 text-chloro-700 underline" %>
         </span>
       </li>
     <% end %>
   </ul>
 </section>
 
-<section class="mt-8 rounded border border-stone-200 bg-white p-6">
-  <h2 class="mb-2 text-[10px] font-semibold uppercase tracking-widest text-stone-500">Rappels</h2>
-  <p class="max-w-2xl text-sm text-stone-600">
+<section class="mt-8 rounded-xl border border-ash-200 bg-white p-6">
+  <h2 class="mb-2 text-[10px] font-bold uppercase tracking-widest text-ash-500">Rappels</h2>
+  <p class="max-w-2xl text-sm text-ash-500">
     Deux notifications, envoyées à tous les appareils où vous les aurez activées :
     <strong>la veille au soir</strong>, sortir du congélateur les portions du lendemain ;
     <strong>le samedi matin</strong>, la session de batch du lendemain et les trempages à lancer le soir même.
   </p>
   <button type="button" data-enable-push
-          class="mt-4 rounded border border-stone-300 px-4 py-2 text-sm hover:border-stone-500">
+          class="mt-4 rounded-lg border border-ash-300 px-4 py-2 text-sm hover:border-chloro-400">
     Activer les notifications sur cet appareil
   </button>
-  <p class="mt-2 text-xs text-stone-500">
+  <p class="mt-2 text-xs text-ash-500">
     <%= PushSubscription.count %> appareil(s) enregistré(s).
   </p>
 </section>
