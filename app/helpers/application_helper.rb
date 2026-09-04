@@ -2,7 +2,7 @@ module ApplicationHelper
   # Incrémenter à chaque modification des icônes. Sans ce cache-buster, les
   # icônes mises à jour n'atteignent jamais les caches du navigateur, de l'OS
   # ni les notifications déjà envoyées.
-  ICON_VERSION = 1
+  ICON_VERSION = 2
 
   def versioned_icon_path(filename)
     "#{asset_path(filename)}?v=#{ICON_VERSION}"
