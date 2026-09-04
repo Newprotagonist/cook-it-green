@@ -170,10 +170,18 @@ de logique. `Menu::InvariantTest::KNOWN_STORAGE_VIOLATIONS` est repassé à `[]`
 
 ### Déploiement — en cours de préparation
 
-Le blocage « pas de domaine » est levé (`cookitgreen.com` acheté). `service` et `image`
-de `config/deploy.yml` sont renommés ; `<ip-du-serveur>` et `<utilisateur-github>`
-restent à remplir (l'utilisateur a un serveur Docker déjà prêt). Ne pas lancer `kamal`
-sans accord explicite à chaque fois — consigne qui reste valable même le gabarit rempli.
+Le blocage « pas de domaine » est levé (`cookitgreen.com` acheté). `config/deploy.yml`
+est entièrement rempli : serveur `2.28.42.48`, hôte `cookitgreen.com`, image
+`ghcr.io/newprotagonist/cook-it-green`. Ne pas lancer `kamal` sans accord explicite à
+chaque fois — consigne qui reste valable même le gabarit rempli.
+
+**`2.28.42.48` héberge déjà `planner`** (Move the Spark, `~/code/Newprotagonist/planner`,
+`config/deploy.yml` de ce projet) via kamal-proxy — plusieurs apps sur un même serveur,
+routées par hostname, c'est le fonctionnement prévu, pas un conflit. En revanche
+`planner` utilise `builder.arch: amd64` : le gabarit de Cook It Green avait hérité
+`arm64` par erreur (jamais vérifié contre le serveur réel), corrigé le 2026-09-05 après
+comparaison. Toute architecture différente entre deux apps du même serveur physique est
+un signal d'erreur, pas une variante légitime.
 
 **Décision du 2026-09-05 :** la sauvegarde SQLite hors serveur (fils ouverts, point 5)
 sera réglée *après* le premier déploiement, pas avant — écart assumé à la recommandation

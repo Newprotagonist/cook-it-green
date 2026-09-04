@@ -50,7 +50,7 @@ volumes:
 asset_path: /rails/public/assets
 
 builder:
-  arch: arm64
+  arch: amd64
 
 # ssh:
 #   user: root
