@@ -1,11 +1,12 @@
-# Batch cooking — contexte projet
+# Cook It Green — contexte projet
 
-App Rails 8 mono-utilisateur (PWA) qui génère un **menu végétalien annuel calibré au
+App Rails 8 mono-utilisateur (PWA) qui génère un **menu vegan annuel calibré au
 gramme** : 16 semaines de rotation, 48 plats, une session de cuisine de 3 h par semaine.
 
-Le nom `batch_cooking` est **provisoire** : le nom définitif est décidé (« Cook It Green »,
-voir « Fils ouverts »), en attente de l'achat du domaine avant de renommer le dossier,
-le module Rails et le chemin d'image ghcr.io.
+Nom définitif : **Cook It Green** (domaine `cookitgreen.com` acheté). Le module Rails
+(`CookItGreen`) et le chemin d'image ghcr.io (`cook-it-green`) sont renommés ; seul le
+dossier physique sur disque s'appelle encore `batch_cooking`, à renommer à la main
+(`mv`, puis rouvrir l'éditeur et les terminaux ouverts dessus).
 
 Langue du projet : **français**, code compris (noms de recettes, commentaires, UI, commits).
 
@@ -155,11 +156,9 @@ de logique. `Menu::InvariantTest::KNOWN_STORAGE_VIOLATIONS` est repassé à `[]`
    grammage ne suivent plus (un homme de 85 kg en prise de masse demande 516 g de glucides).
    À trancher : élargir les bornes — c'est un changement de **données**, pas de code — ou
    ajouter une 5ᵉ prise au-delà d'un seuil.
-4. **Nom décidé : « Cook It Green ».** Le calibrage nutritionnel reste en sous-titre
-   (ex. « vegan, calibré au gramme »), pas dans le nom lui-même. `cookitgreen.com`
-   semblait libre le 2026-09-03 (recherche web + DNS sans résolution) — à confirmer sur
-   un registrar puis à acheter. Une fois le domaine acquis : renommer le dossier, le
-   module Rails et le chemin d'image ghcr.io (voir ligne 6 de ce fichier).
+4. **Nom acquis : « Cook It Green »**, domaine `cookitgreen.com` acheté (2026-09-04).
+   Module Rails et image ghcr.io renommés (2026-09-05). Reste seulement le dossier
+   physique sur disque (`batch_cooking`), à renommer à la main.
 5. **Sauvegarde hors serveur** du volume SQLite, à régler *avant* toute mise en ligne.
    Ce point a été reporté puis oublié sur Move the Spark.
 6. **Deux modes, à terme : batch cooking et daily cooking.** Aujourd'hui toute l'app
@@ -169,12 +168,17 @@ de logique. `Menu::InvariantTest::KNOWN_STORAGE_VIOLATIONS` est repassé à `[]`
    recettes et la même cible nutritionnelle, ou si le quotidien a sa propre rotation.
    Implique `Nutrition::Solver`, `Menu::Recalculator` et `Menu::Week` a minima.
 
-### Déploiement — bloqué volontairement
+### Déploiement — en cours de préparation
 
-`config/deploy.yml` est un **gabarit** : `<domaine.tld>`, `<ip-du-serveur>` et
-`<utilisateur-github>` restent à remplir. Consigne explicite de l'utilisateur :
-**aucun déploiement tant que le nom de domaine n'est pas configuré.** Ne pas lancer
-`kamal` sans accord. Le démon Docker doit tourner (Kamal construit l'image en local).
+Le blocage « pas de domaine » est levé (`cookitgreen.com` acheté). `service` et `image`
+de `config/deploy.yml` sont renommés ; `<ip-du-serveur>` et `<utilisateur-github>`
+restent à remplir (l'utilisateur a un serveur Docker déjà prêt). Ne pas lancer `kamal`
+sans accord explicite à chaque fois — consigne qui reste valable même le gabarit rempli.
+
+**Décision du 2026-09-05 :** la sauvegarde SQLite hors serveur (fils ouverts, point 5)
+sera réglée *après* le premier déploiement, pas avant — écart assumé à la recommandation
+du gabarit lui-même, qui rappelle que ce report a été oublié sur Move the Spark. À ne
+pas oublier une deuxième fois.
 
 ---
 

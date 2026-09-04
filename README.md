@@ -1,9 +1,10 @@
-# Batch cooking
+# Cook It Green
 
-Menu végétalien annuel calibré au gramme, en batch cooking : 16 semaines de rotation,
+Menu vegan annuel calibré au gramme, en batch cooking : 16 semaines de rotation,
 48 plats, une session de cuisine de 3 h par semaine. PWA mono-utilisateur.
 
-Le nom définitif reste à choisir — `batch_cooking` est provisoire.
+Le dossier s'appelle encore `batch_cooking` sur disque — le nom définitif est décidé
+(« Cook It Green »), seul le renommage du dossier physique reste à faire à la main.
 
 ## Le principe
 

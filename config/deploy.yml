@@ -1,25 +1,24 @@
-# GABARIT — NON DÉPLOYÉ.
-# Les valeurs entre <> restent à remplir une fois le nom de domaine choisi.
-# Ne lancer `bin/kamal setup` qu'après avoir : acheté le domaine, pointé son A record
-# vers l'IP du serveur, et démarré le démon Docker (Kamal construit l'image en local).
+# PAS ENCORE DÉPLOYÉ. Gabarit rempli — reste à faire avant `bin/kamal setup` :
+# pointer le A record de cookitgreen.com vers 2.28.42.48, démarrer le démon Docker
+# (Kamal construit l'image en local), et exporter les secrets (voir .kamal/secrets).
 
-service: batch-cooking
+service: cook-it-green
 
 # Sur un registre externe, le chemin DOIT être owner/app-name : un nom d'app seul
 # échoue silencieusement au push.
-image: <utilisateur-github>/batch-cooking
+image: newprotagonist/cook-it-green
 
 servers:
   web:
-    - <ip-du-serveur>
+    - 2.28.42.48
 
 proxy:
   ssl: true
-  host: <domaine.tld>          # Let's Encrypt est automatique une fois le DNS résolu
+  host: cookitgreen.com        # Let's Encrypt est automatique une fois le DNS résolu
 
 registry:
   server: ghcr.io
-  username: <utilisateur-github>
+  username: newprotagonist
   password:
     - KAMAL_REGISTRY_PASSWORD  # PAT GitHub classique, scope write:packages
 
@@ -46,7 +45,7 @@ aliases:
 # sur un VPS unique n'est pas une sauvegarde. Prévoir un dump SQLite chiffré vers
 # un stockage compatible S3, planifié, et une restauration testée au moins une fois.
 volumes:
-  - "batch_cooking_storage:/rails/storage"
+  - "cook_it_green_storage:/rails/storage"
 
 asset_path: /rails/public/assets
 
