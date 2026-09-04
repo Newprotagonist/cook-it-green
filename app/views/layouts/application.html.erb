@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
-    <title><%= content_for(:title) || "Batch cooking" %></title>
+    <title><%= content_for(:title) || "Cook It Green" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#1c1917">
+    <meta name="theme-color" content="#0A6A2B">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= yield :head %>
@@ -17,27 +17,78 @@
     <%= tag.link rel: "icon", href: versioned_icon_path("icon-192.png"), type: "image/png" %>
     <%= tag.link rel: "apple-touch-icon", href: versioned_icon_path("apple-touch-icon.png") %>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-screen bg-stone-50 text-stone-900 antialiased">
-    <header class="border-b border-stone-200 bg-white">
-      <nav class="mx-auto flex max-w-6xl flex-wrap items-baseline gap-x-6 gap-y-2 px-5 py-4">
-        <%= link_to "Batch cooking", root_path, class: "font-semibold tracking-tight" %>
-        <div class="flex gap-5 text-sm text-stone-600">
-          <%= link_to "Semaines", weeks_path, class: "hover:text-stone-900" %>
-          <%= link_to "Profil & besoins", profile_path, class: "hover:text-stone-900" %>
-          <%= link_to "Cibles", nutrition_targets_path, class: "hover:text-stone-900" %>
+  <%
+    in_week = controller_name == "weeks" && action_name == "show"
+    on_dish = controller_name == "dishes"
+    week_number = in_week ? @week.number : (on_dish ? @dish.week_number : nil)
+    mobile_title, mobile_subtitle, mobile_kcal, mobile_settings =
+      case [ controller_name, action_name ]
+      in [ "weeks", "index" ]
+        [ nil, nil, false, true ]
+      in [ "weeks", "show" ]
+        [ "Semaine #{@week.number}", Menu::Calendar.label_for(@week.season), true, true ]
+      in [ "dishes", "show" ]
+        [ "Plats & recettes", "Semaine #{@dish.week_number}", false, true ]
+      in [ "nutrition_targets", _ ]
+        [ "Cibles nutritionnelles", "Étape 2 · configuration", false, false ]
+      in [ "profiles", _ ]
+        [ "Profil & besoins", "Étape 1 · vos besoins", false, false ]
+      else
+        [ nil, nil, false, true ]
+      end
+    show_tab_bar = in_week || on_dish || (controller_name == "weeks" && action_name == "index")
+  %>
+
+  <body class="min-h-screen bg-ash-50 text-ash-900 antialiased <%= "pb-14 lg:pb-0" if show_tab_bar %>">
+    <header class="hidden border-b border-chloro-800 bg-chloro-700 lg:block">
+      <nav class="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-5 py-4">
+        <%= link_to root_path, class: "flex items-center gap-2" do %>
+          <%= render "shared/mark" %>
+          <span class="font-extrabold tracking-tight text-white">COOK IT <span class="text-zest-400">GREEN</span></span>
+        <% end %>
+        <div class="flex gap-5 text-sm text-chloro-100">
+          <%= link_to "Semaines", weeks_path, class: "hover:text-white" %>
+          <%= link_to "Profil & besoins", profile_path, class: "hover:text-white" %>
+          <%= link_to "Cibles", nutrition_targets_path, class: "hover:text-white" %>
         </div>
         <% if (t = NutritionTarget.current) %>
-          <span class="ml-auto text-xs tabular-nums text-stone-500">
+          <span class="ml-auto text-xs tabular-nums text-zest-400">
             <%= t.name %> · <%= kcal t.floor_kcal %> kcal ·
             P<%= t.protein.to_i %> L<%= t.lipid.to_i %> G<%= t.carb.to_i %> F<%= t.fiber.to_i %>
-            <% unless t.resolved? %><span class="text-amber-600">· non résolue</span><% end %>
+            <% unless t.resolved? %><span class="text-amber-300">· non résolue</span><% end %>
           </span>
         <% end %>
       </nav>
+    </header>
+
+    <header class="sticky top-0 z-20 flex items-center justify-between gap-3 bg-chloro-700 px-4 py-3 lg:hidden">
+      <% if mobile_title %>
+        <span class="flex flex-col">
+          <span class="text-[15px] font-extrabold tracking-tight text-white"><%= mobile_title %></span>
+          <% if mobile_subtitle %><span class="text-[9px] font-semibold uppercase tracking-widest text-chloro-200"><%= mobile_subtitle %></span><% end %>
+        </span>
+      <% else %>
+        <%= link_to root_path, class: "flex items-center gap-2" do %>
+          <%= render "shared/mark" %>
+          <span class="font-extrabold tracking-tight text-white">COOK IT <span class="text-zest-400">GREEN</span></span>
+        <% end %>
+      <% end %>
+      <span class="flex items-center gap-2.5">
+        <% if mobile_kcal && (t = NutritionTarget.current) %>
+          <span class="text-right text-[11px] font-bold tabular-nums leading-tight text-zest-400">
+            <%= kcal t.floor_kcal %><br><span class="font-medium text-chloro-200">kcal cible</span>
+          </span>
+        <% end %>
+        <% if mobile_settings %><%= render "shared/settings_menu" %><% end %>
+      </span>
     </header>
 
     <% if flash[:notice] || flash[:alert] %>
@@ -51,11 +102,24 @@
       </div>
     <% end %>
 
-    <main class="mx-auto max-w-6xl px-5 py-8"><%= yield %></main>
+    <main class="mx-auto max-w-6xl px-5 py-8 lg:px-5"><%= yield %></main>
 
-    <footer class="mx-auto max-w-6xl px-5 py-10 text-xs leading-relaxed text-stone-500">
+    <footer class="mx-auto max-w-6xl px-5 py-10 text-xs leading-relaxed text-ash-500">
       Convention française : glucides hors fibres, kcal = 4P + 9L + 4G + 2F.
       Valeurs Ciqual 2020 / USDA. Ce plan n'est pas un avis médical.
     </footer>
+
+    <% if controller_name == "weeks" && action_name == "index" %>
+      <%= render "shared/mobile_tabs", items: [
+        [ "Semaines", weeks_path, true ],
+        [ "Profil", profile_path, false ],
+        [ "Cibles", nutrition_targets_path, false ]
+      ] %>
+    <% elsif week_number %>
+      <% active = on_dish ? "plats" : @view %>
+      <%= render "shared/mobile_tabs", items: WeeksController::VIEWS.map { |key|
+        [ key.capitalize, week_path(week_number, view: key), key == active ]
+      } %>
+    <% end %>
   </body>
 </html>

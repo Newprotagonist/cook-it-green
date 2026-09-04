@@ -3,7 +3,7 @@ module Menu
   # liste de courses et déroulé de la session de batch cooking.
   class Week
     Day = Struct.new(:index, :name, :breakfast, :lunch, :snack, :dinner,
-                     :lunch_role, :dinner_role, :from_freezer, :revival, :totals,
+                     :lunch_role, :dinner_role, :from_freezer, :revival, :totals, :today,
                      keyword_init: true)
     Line = Struct.new(:ingredient, :grams, :note, keyword_init: true)
     Step = Struct.new(:time, :duration, :title, :actions, keyword_init: true)
@@ -41,7 +41,8 @@ module Menu
         Day.new(index: pattern.day_index, name: pattern.day_name,
                 breakfast: breakfast, lunch: lunch, snack: snack, dinner: dinner,
                 lunch_role: pattern.lunch_role, dinner_role: pattern.dinner_role,
-                from_freezer: pattern.from_freezer?, revival: pattern.revival, totals: totals)
+                from_freezer: pattern.from_freezer?, revival: pattern.revival, totals: totals,
+                today: pattern.day_index == Menu::Calendar.today_day_index)
       end
     end
 

@@ -26,6 +26,12 @@ module Menu
       numbers[date.cweek % numbers.size]
     end
 
+    # 0 = lundi, cohérent avec WeekPattern#day_index (Date#wday donne 0 = dimanche).
+    def today_day_index(date = Date.current) = (date.wday + 6) % 7
+
+    # Avant 15 h, on vise le déjeuner à venir ou en cours ; après, le dîner.
+    def now_slot(time = Time.current) = time.hour < 15 ? :lunch : :dinner
+
     # La session de batch a lieu le dimanche qui précède la semaine de menu.
     def next_batch_session(date = Date.current)
       date.sunday? ? date : date.next_occurring(:sunday)

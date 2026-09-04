@@ -1,1 +1,33 @@
 @import "tailwindcss";
+
+/* Identité « Chlorophylle » — le vert est une surface, pas un accent : bandeaux,
+   cartes actives et boutons passent en fond chloro plein. zest est l'unique accent de
+   toute l'app, réservé au jour/moment courant, à l'étape en cours et aux leviers du
+   solveur — ne jamais l'utiliser ailleurs. ash remplace stone. */
+@theme {
+  --font-sans: "Schibsted Grotesk", ui-sans-serif, system-ui, sans-serif;
+
+  --color-chloro-50: #ECFCEF;
+  --color-chloro-100: #D3F7DA;
+  --color-chloro-200: #A6EDB5;
+  --color-chloro-300: #6EDC88;
+  --color-chloro-400: #33C45C;
+  --color-chloro-500: #12A63F;
+  --color-chloro-600: #0A8633;
+  --color-chloro-700: #0A6A2B;
+  --color-chloro-800: #0B5224;
+  --color-chloro-900: #0A3A1B;
+  --color-chloro-950: #052110;
+
+  --color-ash-50: #FAFAF7;
+  --color-ash-100: #F2F2ED;
+  --color-ash-200: #E4E4DD;
+  --color-ash-300: #CBCBC2;
+  --color-ash-400: #9A9A90;
+  --color-ash-500: #6E6E65;
+  --color-ash-900: #141814;
+
+  --color-zest-300: #D6F55E;
+  --color-zest-400: #C2EC33;
+  --color-zest-500: #A6CE1E;
+}

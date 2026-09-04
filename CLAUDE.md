@@ -3,8 +3,9 @@
 App Rails 8 mono-utilisateur (PWA) qui génère un **menu végétalien annuel calibré au
 gramme** : 16 semaines de rotation, 48 plats, une session de cuisine de 3 h par semaine.
 
-Le nom `batch_cooking` est **provisoire**, le définitif reste à choisir. Il faudra alors
-renommer le dossier, le module Rails et le chemin d'image ghcr.io.
+Le nom `batch_cooking` est **provisoire** : le nom définitif est décidé (« Cook It Green »,
+voir « Fils ouverts »), en attente de l'achat du domaine avant de renommer le dossier,
+le module Rails et le chemin d'image ghcr.io.
 
 Langue du projet : **français**, code compris (noms de recettes, commentaires, UI, commits).
 
@@ -154,9 +155,19 @@ de logique. `Menu::InvariantTest::KNOWN_STORAGE_VIOLATIONS` est repassé à `[]`
    grammage ne suivent plus (un homme de 85 kg en prise de masse demande 516 g de glucides).
    À trancher : élargir les bornes — c'est un changement de **données**, pas de code — ou
    ajouter une 5ᵉ prise au-delà d'un seuil.
-4. **Nom définitif** de l'app, puis domaine.
+4. **Nom décidé : « Cook It Green ».** Le calibrage nutritionnel reste en sous-titre
+   (ex. « vegan, calibré au gramme »), pas dans le nom lui-même. `cookitgreen.com`
+   semblait libre le 2026-09-03 (recherche web + DNS sans résolution) — à confirmer sur
+   un registrar puis à acheter. Une fois le domaine acquis : renommer le dossier, le
+   module Rails et le chemin d'image ghcr.io (voir ligne 6 de ce fichier).
 5. **Sauvegarde hors serveur** du volume SQLite, à régler *avant* toute mise en ligne.
    Ce point a été reporté puis oublié sur Move the Spark.
+6. **Deux modes, à terme : batch cooking et daily cooking.** Aujourd'hui toute l'app
+   suppose une session unique de 3 h par semaine et une rotation figée sur 16 semaines —
+   la notion même de rôles F/A/B (`Menu::Week#roles`) n'a de sens qu'en batch. Chantier
+   de fond, pas encore cadré : reste à décider si les deux modes partagent les mêmes
+   recettes et la même cible nutritionnelle, ou si le quotidien a sa propre rotation.
+   Implique `Nutrition::Solver`, `Menu::Recalculator` et `Menu::Week` a minima.
 
 ### Déploiement — bloqué volontairement
 
