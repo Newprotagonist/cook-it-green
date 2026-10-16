@@ -147,9 +147,8 @@ de logique. `Menu::InvariantTest::KNOWN_STORAGE_VIOLATIONS` est repassé à `[]`
 
 ### Fils ouverts
 
-1. **UI mobile**, étroitement : les deux seuls écrans utilisés loin d'un bureau sont la
-   liste de courses (au magasin) et le planning (dans la cuisine). Ce sont aujourd'hui des
-   tableaux larges pensés pour un ordinateur. Plus l'installation sur l'écran d'accueil.
+1. ~~**UI mobile**~~ — fait : identité Chlorophylle déclinée sur les 11 écrans avec 3
+   patrons mobile dédiés (`118a80c`), PWA installable sur écran d'accueil.
 2. **Corriger la mémoire du pattern** (`webpush` → `web-push`) dans le projet `planner`,
    sinon la prochaine app retombe dans le même mur OpenSSL 3.
 3. **Plage calorique.** Le menu couvre environ 1 600–2 600 kcal. Au-delà, les bornes de
@@ -159,8 +158,8 @@ de logique. `Menu::InvariantTest::KNOWN_STORAGE_VIOLATIONS` est repassé à `[]`
 4. **Nom acquis : « Cook It Green »**, domaine `cookitgreen.com` acheté (2026-09-04).
    Module Rails et image ghcr.io renommés (2026-09-05). Reste seulement le dossier
    physique sur disque (`batch_cooking`), à renommer à la main.
-5. **Sauvegarde hors serveur** du volume SQLite, à régler *avant* toute mise en ligne.
-   Ce point a été reporté puis oublié sur Move the Spark.
+5. **Sauvegarde hors serveur du volume SQLite** — délibérément ignorée pour l'instant
+   (décision reconfirmée, pas un oubli).
 6. **Deux modes, à terme : batch cooking et daily cooking.** Aujourd'hui toute l'app
    suppose une session unique de 3 h par semaine et une rotation figée sur 16 semaines —
    la notion même de rôles F/A/B (`Menu::Week#roles`) n'a de sens qu'en batch. Chantier
@@ -168,12 +167,14 @@ de logique. `Menu::InvariantTest::KNOWN_STORAGE_VIOLATIONS` est repassé à `[]`
    recettes et la même cible nutritionnelle, ou si le quotidien a sa propre rotation.
    Implique `Nutrition::Solver`, `Menu::Recalculator` et `Menu::Week` a minima.
 
-### Déploiement — en cours de préparation
+### Déploiement — fait le 2026-09-05
 
-Le blocage « pas de domaine » est levé (`cookitgreen.com` acheté). `config/deploy.yml`
-est entièrement rempli : serveur `2.28.42.48`, hôte `cookitgreen.com`, image
-`ghcr.io/newprotagonist/cook-it-green`. Ne pas lancer `kamal` sans accord explicite à
-chaque fois — consigne qui reste valable même le gabarit rempli.
+Premier `bin/kamal setup` lancé avec succès (secrets exportés à la main : `RAILS_MASTER_KEY`
+depuis `config/master.key`, `KAMAL_REGISTRY_PASSWORD` via `gh auth token`, `BASIC_AUTH_USER`/
+`BASIC_AUTH_PASSWORD` générés aléatoirement et communiqués hors de ce fichier). `https://cookitgreen.com/up`
+répond 200, la racine répond 401 sans identifiants et 200 avec — le garde-fou d'authentification
+fonctionne. Ne pas relancer `kamal` sans accord explicite à chaque fois reste valable pour
+les déploiements suivants.
 
 **`2.28.42.48` héberge déjà `planner`** (Move the Spark, `~/code/Newprotagonist/planner`,
 `config/deploy.yml` de ce projet) via kamal-proxy — plusieurs apps sur un même serveur,
