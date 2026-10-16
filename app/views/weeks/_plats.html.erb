@@ -17,7 +17,7 @@
 
         <div class="mt-5 grid gap-8 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
           <div>
-            <p class="mb-2 text-[10px] uppercase tracking-widest text-ash-400">Pour une portion</p>
+            <p class="mb-2 text-[10px] uppercase tracking-widest text-ash-500">Pour une portion</p>
             <ul class="text-sm">
               <% levers = resolved.lever_keys %>
               <% resolved.lines.each do |ingredient, g| %>
@@ -35,7 +35,7 @@
             <p class="mt-2 text-xs text-ash-500">Multipliez par <strong><%= week.portions[role] %></strong> pour la session.</p>
           </div>
           <div>
-            <p class="mb-2 text-[10px] uppercase tracking-widest text-ash-400">Méthode</p>
+            <p class="mb-2 text-[10px] uppercase tracking-widest text-ash-500">Méthode</p>
             <ol class="space-y-3 text-sm text-ash-500">
               <% dish.steps.each_with_index do |step, i| %>
                 <li class="grid grid-cols-[1.5rem_1fr] gap-3">
@@ -57,7 +57,7 @@
   <% ResolvedFixedMeal.where(nutrition_target: target, season: week.season)
                       .includes(:fixed_meal).sort_by { |r| [r.fixed_meal.kind, r.fixed_meal.position] }.each do |r| %>
     <article class="rounded-xl border border-ash-200 bg-white p-6">
-      <p class="text-xs uppercase tracking-widest text-ash-400">
+      <p class="text-xs uppercase tracking-widest text-ash-500">
         <%= r.fixed_meal.kind == "breakfast" ? "Petit-déjeuner" : "Collation" %>
       </p>
       <h3 class="mt-1 text-lg font-semibold tracking-tight text-ash-900"><%= r.fixed_meal.name %></h3>
@@ -75,7 +75,7 @@
           <ol class="space-y-3 text-sm text-ash-500">
             <% r.fixed_meal.steps.each_with_index do |step, i| %>
               <li class="grid grid-cols-[1.5rem_1fr] gap-3">
-                <span class="pt-0.5 text-xs font-semibold text-ash-400"><%= i + 1 %></span><span><%= step %></span>
+                <span class="pt-0.5 text-xs font-semibold text-ash-500"><%= i + 1 %></span><span><%= step %></span>
               </li>
             <% end %>
           </ol>

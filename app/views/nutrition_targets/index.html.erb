@@ -1,6 +1,6 @@
 <% content_for :title, "Cibles nutritionnelles" %>
 
-<p class="text-xs font-bold uppercase tracking-widest text-chloro-600">Étape 2</p>
+<p class="text-xs font-bold uppercase tracking-widest text-chloro-700">Étape 2</p>
 <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-ash-900">Cibles nutritionnelles</h1>
 <p class="mt-2 max-w-3xl text-ash-500">
   Une cible porte ses quatre minimums quotidiens, ses marges d'arrondi et sa répartition sur la journée.
@@ -16,7 +16,7 @@
           <% if target.active? %>
             <span class="rounded-full bg-zest-400 px-2.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wide text-chloro-950">active</span>
           <% end %>
-          <span class="text-xs font-normal text-ash-400"><%= target.source %></span>
+          <span class="text-xs font-normal text-ash-500"><%= target.source %></span>
         </span>
         <span class="text-xs tabular-nums text-ash-500">
           Plancher <%= kcal target.floor_kcal %> kcal ·
@@ -40,7 +40,7 @@
             <span class="flex items-center gap-2">
               <%= f.number_field field, step: 1, inputmode: "decimal",
                     class: "w-24 rounded-lg border border-ash-300 bg-white px-3 py-2 text-right text-[15px] font-semibold tabular-nums text-ash-900 focus:border-chloro-500 focus:outline focus:outline-2 focus:outline-chloro-100" %>
-              <span class="w-4 text-xs font-medium text-ash-400">g</span>
+              <span class="w-4 text-xs font-medium text-ash-500">g</span>
             </span>
           </label>
         <% end %>
@@ -61,18 +61,18 @@
       </div>
 
       <div class="border-t border-ash-100 px-5 py-5">
-        <p class="mb-2.5 text-[10px] font-bold uppercase tracking-widest text-ash-400">Répartition sur la journée</p>
+        <p class="mb-2.5 text-[10px] font-bold uppercase tracking-widest text-ash-500">Répartition sur la journée</p>
         <div class="grid gap-2.5 sm:grid-cols-3">
           <% target.meal_shares.each do |share| %>
             <div class="rounded-lg border border-ash-200 p-3.5">
               <div class="flex items-baseline justify-between gap-2">
                 <span class="text-sm font-semibold text-ash-900"><%= share.label %></span>
-                <span class="flex-none text-xs font-bold tabular-nums text-chloro-600"><%= share.servings_per_day %>×/jour</span>
+                <span class="flex-none text-xs font-bold tabular-nums text-chloro-700"><%= share.servings_per_day %>×/jour</span>
               </div>
               <div class="mt-2 grid grid-cols-3 gap-1.5">
                 <% [[:protein_share, "Prot."], [:lipid_share, "Lip."], [:carb_share, "Gluc."]].each do |attr, label| %>
                   <div class="rounded bg-chloro-50 px-1.5 py-1.5 text-center">
-                    <p class="text-[8.5px] font-bold uppercase tracking-widest text-chloro-600"><%= label %></p>
+                    <p class="text-[8.5px] font-bold uppercase tracking-widest text-chloro-700"><%= label %></p>
                     <p class="mt-0.5 text-xs font-bold tabular-nums text-chloro-900">
                       <%= number_to_percentage share.public_send(attr).to_f * 100, precision: 1 %>
                     </p>
@@ -88,18 +88,18 @@
 </div>
 
 <section class="mt-8 rounded-xl border border-dashed border-ash-300 p-6">
-  <h2 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-ash-400">Nouvelle cible</h2>
+  <h2 class="mb-4 text-[10px] font-bold uppercase tracking-widest text-ash-500">Nouvelle cible</h2>
   <%= form_with model: NutritionTarget.new, url: nutrition_targets_path,
                 class: "flex flex-wrap items-end gap-3" do |f| %>
     <label class="block">
-      <span class="text-[10px] uppercase tracking-wider text-ash-400">Nom</span>
+      <span class="text-[10px] uppercase tracking-wider text-ash-500">Nom</span>
       <%= f.text_field :name, placeholder: "Ma cible", required: true,
             class: "mt-1 w-56 rounded border border-ash-300 px-2 py-1.5 text-sm focus:border-chloro-500 focus:outline focus:outline-2 focus:outline-chloro-100" %>
     </label>
     <% [[:kcal, "kcal", 1864], [:protein, "Protéines", 117], [:lipid, "Lipides", 93],
         [:carb, "Glucides", 130], [:fiber, "Fibres", 19]].each do |field, label, default| %>
       <label class="block">
-        <span class="text-[10px] uppercase tracking-wider text-ash-400"><%= label %></span>
+        <span class="text-[10px] uppercase tracking-wider text-ash-500"><%= label %></span>
         <%= f.number_field field, value: default, step: 1, required: true, inputmode: "decimal",
               class: "mt-1 w-24 rounded border border-ash-300 px-2 py-1.5 text-sm tabular-nums focus:border-chloro-500 focus:outline focus:outline-2 focus:outline-chloro-100" %>
       </label>

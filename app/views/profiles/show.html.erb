@@ -1,6 +1,6 @@
 <% content_for :title, "Profil & besoins" %>
 
-<p class="text-xs font-bold uppercase tracking-widest text-chloro-600">Étape 1</p>
+<p class="text-xs font-bold uppercase tracking-widest text-chloro-700">Étape 1</p>
 <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-ash-900">Vos besoins</h1>
 <p class="mt-2 max-w-2xl text-ash-500">
   Le calculateur estime le métabolisme de base et la dépense, puis en déduit une répartition.
@@ -23,7 +23,7 @@
           <span class="flex items-center gap-2">
             <%= f.number_field field, step: field == :age ? 1 : 0.5, inputmode: "decimal",
                   class: "w-24 rounded-lg border border-ash-300 bg-white px-3 py-2 text-right text-[15px] font-semibold tabular-nums text-ash-900 focus:border-chloro-500 focus:outline focus:outline-2 focus:outline-chloro-100" %>
-            <span class="w-6 text-xs font-medium text-ash-400"><%= unit %></span>
+            <span class="w-6 text-xs font-medium text-ash-500"><%= unit %></span>
           </span>
         </label>
       <% end %>
@@ -32,13 +32,13 @@
         <%= f.collection_select :activity_level_id, ActivityLevel.all, :id, :name, {},
               class: "max-w-[60%] rounded-lg border border-ash-300 bg-white px-3 py-2 text-right text-[15px] font-semibold text-ash-900 focus:border-chloro-500 focus:outline focus:outline-2 focus:outline-chloro-100" %>
       </label>
-      <p class="border-b border-ash-100 px-5 pb-3 pt-1 text-xs text-ash-400"><%= @profile.activity_level&.description %></p>
+      <p class="border-b border-ash-100 px-5 pb-3 pt-1 text-xs text-ash-500"><%= @profile.activity_level&.description %></p>
       <label class="flex min-h-14 items-center justify-between gap-4 border-b border-ash-100 px-5">
         <span class="text-[15px] text-ash-900">Objectif</span>
         <%= f.collection_select :goal_id, Goal.all, :id, :name, {},
               class: "max-w-[60%] rounded-lg border border-ash-300 bg-white px-3 py-2 text-right text-[15px] font-semibold text-ash-900 focus:border-chloro-500 focus:outline focus:outline-2 focus:outline-chloro-100" %>
       </label>
-      <p class="px-5 pb-4 pt-1 text-xs text-ash-400"><%= @profile.goal&.description %></p>
+      <p class="px-5 pb-4 pt-1 text-xs text-ash-500"><%= @profile.goal&.description %></p>
       <div class="p-5 pt-0">
         <%= f.submit "Mettre à jour le profil",
               class: "block w-full rounded-lg bg-chloro-700 px-4 py-3 text-center text-sm font-bold text-white hover:bg-chloro-600 sm:inline-block sm:w-auto sm:py-2" %>

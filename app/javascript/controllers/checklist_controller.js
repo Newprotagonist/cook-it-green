@@ -26,7 +26,7 @@ export default class extends Controller {
     const on = !!this.checked[el.dataset.key]
     el.querySelectorAll("[data-checklist-strike]").forEach((n) => {
       n.classList.toggle("line-through", on)
-      n.classList.toggle("text-ash-400", on)
+      n.classList.toggle("text-ash-500", on)
     })
     el.querySelectorAll("[data-checklist-box]").forEach((n) => {
       n.classList.toggle("bg-chloro-700", on)

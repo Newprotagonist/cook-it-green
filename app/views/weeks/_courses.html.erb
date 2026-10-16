@@ -16,7 +16,7 @@
           <li class="flex justify-between gap-3 border-b border-dotted border-ash-200 py-1 last:border-0">
             <span>
               <%= line.ingredient.name %>
-              <% if line.note %><span class="block text-xs text-ash-400"><%= line.note %></span><% end %>
+              <% if line.note %><span class="block text-xs text-ash-500"><%= line.note %></span><% end %>
             </span>
             <span class="whitespace-nowrap tabular-nums text-ash-500">
               <%= line.grams >= 1000 ? "#{number_with_precision(line.grams / 1000.0, precision: 1)} kg" : "#{line.grams} g" %>
@@ -45,7 +45,7 @@
           <span data-checklist-box class="flex h-6 w-6 flex-none items-center justify-center rounded-full border-[1.5px] border-ash-300 bg-white text-xs font-bold text-white"></span>
           <span data-checklist-strike class="flex-1">
             <span class="block text-[15px] leading-tight text-ash-900"><%= line.ingredient.name %></span>
-            <% if line.note %><span class="block text-xs text-ash-400"><%= line.note %></span><% end %>
+            <% if line.note %><span class="block text-xs text-ash-500"><%= line.note %></span><% end %>
           </span>
           <span class="whitespace-nowrap text-[15px] font-bold tabular-nums text-chloro-700">
             <%= line.grams >= 1000 ? "#{number_with_precision(line.grams / 1000.0, precision: 1)} kg" : "#{line.grams} g" %>
