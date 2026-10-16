@@ -1,46 +1,114 @@
 <% content_for :title, "Les 16 semaines" %>
 
-<div class="mb-8">
-  <p class="text-xs font-bold uppercase tracking-widest text-chloro-700">Rotation annuelle</p>
-  <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-ash-900">Seize semaines, quatre saisons</h1>
-  <p class="mt-2 max-w-2xl text-ash-500">
-    Trois plats par semaine, interchangeables entre midi et soir. Nous sommes en
-    <strong><%= Menu::Calendar.label_for(@season).downcase %></strong><% if @current_week %>,
-    semaine <strong><%= @current_week %></strong> de la rotation<% end %>.
-    Prochaine session de batch : <strong><%= l Menu::Calendar.next_batch_session, format: :long %></strong>.
-  </p>
+<%# Desktop : inchangé dans sa structure. %>
+<div class="hidden lg:block">
+  <div class="mb-8">
+    <p class="text-xs font-bold uppercase tracking-widest text-chloro-700">Rotation annuelle</p>
+    <h1 class="mt-1 text-3xl font-extrabold tracking-tight text-ash-900">Seize semaines, quatre saisons</h1>
+    <p class="mt-2 max-w-2xl text-ash-500">
+      Trois plats par semaine, interchangeables entre midi et soir. Nous sommes en
+      <strong><%= Menu::Calendar.label_for(@season).downcase %></strong><% if @current_week %>,
+      semaine <strong><%= @current_week %></strong> de la rotation<% end %>.
+      Prochaine session de batch : <strong><%= l Menu::Calendar.next_batch_session, format: :long %></strong>.
+    </p>
+  </div>
+
+  <% unless @target&.resolved? %>
+    <p class="mb-6 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+      Aucune cible résolue pour l'instant.
+      <%= link_to "Lancez un recalcul", nutrition_targets_path, class: "underline" %> pour générer les grammages.
+    </p>
+  <% end %>
+
+  <% @weeks_by_season.each do |season, numbers| %>
+    <section class="mb-10">
+      <h2 class="mb-3 text-xs font-bold uppercase tracking-widest text-ash-500">
+        <%= Menu::Calendar.label_for(season) %>
+      </h2>
+      <div class="grid gap-3 lg:grid-cols-4">
+        <% numbers.each do |number| %>
+          <% current = number == @current_week %>
+          <%= link_to week_path(number),
+                class: "block rounded-xl border p-4 transition #{current ? 'border-chloro-700 bg-chloro-700 hover:border-chloro-600' : 'border-ash-200 bg-white hover:border-chloro-300'}" do %>
+            <p class="flex items-baseline justify-between">
+              <span class="font-extrabold tracking-tight <%= current ? 'text-white' : 'text-ash-900' %>">Semaine <%= number %></span>
+              <% if current %>
+                <span class="rounded-full bg-zest-400 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-chloro-950">en cours</span>
+              <% end %>
+            </p>
+            <ul class="mt-2 space-y-1 text-sm <%= current ? 'text-chloro-100' : 'text-ash-500' %>">
+              <% (@dishes_by_week[number] || []).each do |dish| %>
+                <li class="line-clamp-1"><%= dish.name %></li>
+              <% end %>
+            </ul>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
+</div>
+
+<%# Mobile : mode Lecture, pas de bandeau partagé — hero avec son propre en-tête,
+    index 4×4 des saisons, puis le détail de la seule saison courante. %>
+<% season_months = {
+     "hiver" => "décembre → février", "printemps" => "mars → mai",
+     "ete" => "juin → août", "automne" => "septembre → novembre"
+   } %>
+<div class="-mx-5 -mt-8 bg-chloro-900 px-4 pb-5 pt-4 lg:hidden">
+  <div class="mb-3.5 flex items-center justify-between gap-3">
+    <%= link_to root_path, class: "flex items-center gap-2" do %>
+      <%= render "shared/mark" %>
+      <span class="text-[17px] font-extrabold tracking-tight text-white">COOK IT <span class="text-zest-400">GREEN</span></span>
+    <% end %>
+    <%= render "shared/settings_menu" %>
+  </div>
+  <p class="text-[10px] font-bold uppercase tracking-widest text-chloro-300">Rotation annuelle</p>
+  <h1 class="mb-4 mt-1 text-2xl font-extrabold leading-tight tracking-tight text-white">Seize semaines, quatre saisons</h1>
+
+  <div class="flex flex-col gap-1.5">
+    <% Menu::Calendar::SEASON_LABEL.each_key do |season| %>
+      <div class="grid grid-cols-[82px_repeat(4,minmax(0,1fr))] items-center gap-1.5">
+        <span class="flex flex-col">
+          <span class="text-[12px] font-bold text-white"><%= Menu::Calendar.label_for(season) %></span>
+          <span class="text-[9.5px] text-chloro-300"><%= season_months[season] %></span>
+        </span>
+        <% (@weeks_by_season[season] || []).each do |number| %>
+          <% current = number == @current_week %>
+          <%= link_to number, week_path(number),
+                class: "flex h-9 items-center justify-center rounded-md text-[13px] font-bold tabular-nums #{current ? 'bg-zest-400 text-chloro-950' : 'bg-chloro-800 text-chloro-200'}" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
 </div>
 
 <% unless @target&.resolved? %>
-  <p class="mb-6 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+  <p class="mt-5 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 lg:hidden">
     Aucune cible résolue pour l'instant.
     <%= link_to "Lancez un recalcul", nutrition_targets_path, class: "underline" %> pour générer les grammages.
   </p>
 <% end %>
 
-<% @weeks_by_season.each do |season, numbers| %>
-  <section class="mb-10">
-    <h2 class="sticky top-[52px] z-10 -mx-5 mb-3 bg-chloro-700 px-5 py-2 text-xs font-bold uppercase tracking-widest text-white lg:static lg:mx-0 lg:bg-transparent lg:px-0 lg:py-0 lg:text-ash-500">
-      <%= Menu::Calendar.label_for(season) %>
-    </h2>
-    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <% numbers.each do |number| %>
-        <% current = number == @current_week %>
-        <%= link_to week_path(number),
-              class: "block rounded-xl border p-4 transition #{current ? 'border-chloro-700 bg-chloro-700 hover:border-chloro-600' : 'border-ash-200 bg-white hover:border-chloro-300'}" do %>
-          <p class="flex items-baseline justify-between">
-            <span class="font-extrabold tracking-tight <%= current ? 'text-white' : 'text-ash-900' %>">Semaine <%= number %></span>
-            <% if current %>
-              <span class="rounded-full bg-zest-400 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-chloro-950">en cours</span>
-            <% end %>
-          </p>
-          <ul class="mt-2 space-y-1 text-sm <%= current ? 'text-chloro-100' : 'text-ash-500' %>">
-            <% (@dishes_by_week[number] || []).each do |dish| %>
-              <li class="line-clamp-1"><%= dish.name %></li>
-            <% end %>
-          </ul>
+<div class="mt-5 flex items-baseline justify-between lg:hidden">
+  <span class="text-xl font-extrabold tracking-tight text-ash-900"><%= Menu::Calendar.label_for(@season) %></span>
+  <span class="text-xs font-semibold text-ash-500"><%= season_months[@season] %></span>
+</div>
+<div class="mt-3 flex flex-col gap-2.5 lg:hidden">
+  <% (@weeks_by_season[@season] || []).each do |number| %>
+    <% current = number == @current_week %>
+    <%= link_to week_path(number),
+          class: "block rounded-xl border p-4 #{current ? 'border-chloro-700 bg-chloro-700' : 'border-ash-200 bg-white'}" do %>
+      <p class="flex items-baseline justify-between">
+        <span class="font-extrabold tracking-tight <%= current ? 'text-white' : 'text-ash-900' %>">Semaine <%= number %></span>
+        <% if current %>
+          <span class="rounded-full bg-zest-400 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-chloro-950">en cours</span>
         <% end %>
-      <% end %>
-    </div>
-  </section>
-<% end %>
+      </p>
+      <ul class="mt-2 space-y-1 text-sm <%= current ? 'text-chloro-100' : 'text-ash-500' %>">
+        <% (@dishes_by_week[number] || []).each do |dish| %>
+          <li class="line-clamp-1"><%= dish.name %></li>
+        <% end %>
+      </ul>
+    <% end %>
+  <% end %>
+</div>
