@@ -29,6 +29,7 @@
     in_week = controller_name == "weeks" && action_name == "show"
     on_dish = controller_name == "dishes"
     week_number = in_week ? @week.number : (on_dish ? @dish.week_number : nil)
+    in_session = in_week && @view == "session"
     mobile_title, mobile_subtitle, mobile_kcal, mobile_settings =
       case [ controller_name, action_name ]
       in [ "weeks", "index" ]
@@ -44,7 +45,15 @@
       else
         [ nil, nil, false, true ]
       end
-    show_tab_bar = in_week || on_dish || (controller_name == "weeks" && action_name == "index")
+    # Session (mode Cuisine), Fiche plat et Les 16 semaines (mode Lecture) et Cibles
+    # (mode Réglages) portent leur propre en-tête mobile — le bandeau sticky partagé
+    # ne doit pas s'afficher par-dessus. Profil reste sur l'ancien bandeau pour l'instant :
+    # il partage le mode Réglages mais n'a pas encore reçu son propre en-tête de remplacement.
+    suppress_mobile_header = in_session || on_dish || (controller_name == "weeks" && action_name == "index") ||
+                              controller_name == "nutrition_targets"
+    # Session garde la barre d'onglets (variante sombre) ; Les 16 semaines et Cibles
+    # la perdent (mode Lecture-accueil / Réglages, voir plus bas).
+    show_tab_bar = in_week || on_dish
   %>
 
   <body class="min-h-screen bg-ash-50 text-ash-900 antialiased <%= "pb-14 lg:pb-0" if show_tab_bar %>">
@@ -69,27 +78,29 @@
       </nav>
     </header>
 
-    <header class="sticky top-0 z-20 flex items-center justify-between gap-3 bg-chloro-700 px-4 py-3 lg:hidden">
-      <% if mobile_title %>
-        <span class="flex flex-col">
-          <span class="text-[15px] font-extrabold tracking-tight text-white"><%= mobile_title %></span>
-          <% if mobile_subtitle %><span class="text-[9px] font-semibold uppercase tracking-widest text-chloro-200"><%= mobile_subtitle %></span><% end %>
-        </span>
-      <% else %>
-        <%= link_to root_path, class: "flex items-center gap-2" do %>
-          <%= render "shared/mark" %>
-          <span class="font-extrabold tracking-tight text-white">COOK IT <span class="text-zest-400">GREEN</span></span>
-        <% end %>
-      <% end %>
-      <span class="flex items-center gap-2.5">
-        <% if mobile_kcal && (t = NutritionTarget.current) %>
-          <span class="text-right text-[11px] font-bold tabular-nums leading-tight text-zest-400">
-            <%= kcal t.floor_kcal %><br><span class="font-medium text-chloro-200">kcal cible</span>
+    <% unless suppress_mobile_header %>
+      <header class="sticky top-0 z-20 flex items-center justify-between gap-3 bg-chloro-700 px-4 py-3 lg:hidden">
+        <% if mobile_title %>
+          <span class="flex flex-col">
+            <span class="text-[15px] font-extrabold tracking-tight text-white"><%= mobile_title %></span>
+            <% if mobile_subtitle %><span class="text-[9px] font-semibold uppercase tracking-widest text-chloro-200"><%= mobile_subtitle %></span><% end %>
           </span>
+        <% else %>
+          <%= link_to root_path, class: "flex items-center gap-2" do %>
+            <%= render "shared/mark" %>
+            <span class="font-extrabold tracking-tight text-white">COOK IT <span class="text-zest-400">GREEN</span></span>
+          <% end %>
         <% end %>
-        <% if mobile_settings %><%= render "shared/settings_menu" %><% end %>
-      </span>
-    </header>
+        <span class="flex items-center gap-2.5">
+          <% if mobile_kcal && (t = NutritionTarget.current) %>
+            <span class="text-right text-[11px] font-bold tabular-nums leading-tight text-zest-400">
+              <%= kcal t.floor_kcal %><br><span class="font-medium text-chloro-200">kcal cible</span>
+            </span>
+          <% end %>
+          <% if mobile_settings %><%= render "shared/settings_menu" %><% end %>
+        </span>
+      </header>
+    <% end %>
 
     <% if flash[:notice] || flash[:alert] %>
       <div class="mx-auto max-w-6xl px-5 pt-4">
@@ -109,15 +120,9 @@
       Valeurs Ciqual 2020 / USDA. Ce plan n'est pas un avis médical.
     </footer>
 
-    <% if controller_name == "weeks" && action_name == "index" %>
-      <%= render "shared/mobile_tabs", items: [
-        [ "Semaines", weeks_path, true ],
-        [ "Profil", profile_path, false ],
-        [ "Cibles", nutrition_targets_path, false ]
-      ] %>
-    <% elsif week_number %>
+    <% if week_number %>
       <% active = on_dish ? "plats" : @view %>
-      <%= render "shared/mobile_tabs", items: WeeksController::VIEWS.map { |key|
+      <%= render "shared/mobile_tabs", dark: in_session, items: WeeksController::VIEWS.map { |key|
         [ key.capitalize, week_path(week_number, view: key), key == active ]
       } %>
     <% end %>
