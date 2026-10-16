@@ -41,6 +41,16 @@
 </div>
 
 <%# Mobile : rail de cartes balayable, le repas en cours plein écran (2c « bras tendu »). %>
+<div class="flex gap-1.5 px-0.5 pb-3.5 lg:hidden">
+  <% today_index = week.days.find(&:today)&.index %>
+  <% week.days.each do |day| %>
+    <span class="h-[5px] flex-1 rounded-full <%=
+      if day.today then "bg-zest-400"
+      elsif today_index && day.index < today_index then "bg-chloro-400"
+      else "bg-ash-200" end %>"></span>
+  <% end %>
+</div>
+
 <div class="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-1 lg:hidden">
   <% week.days.each do |day| %>
     <% now_meal, now_slot_label =
