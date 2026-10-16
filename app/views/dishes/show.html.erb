@@ -1,6 +1,17 @@
 <% content_for :title, @dish.name %>
 
 <div class="-mx-5 -mt-8 mb-6 bg-chloro-900 px-5 py-6 lg:mx-0 lg:mt-0 lg:rounded-xl lg:px-6">
+  <div class="mb-3.5 flex items-center justify-between gap-3">
+    <%= link_to "‹ Semaine #{@dish.week_number}", week_path(@dish.week_number, view: "plats"), class: "text-sm font-semibold text-chloro-200 hover:text-white" %>
+    <% if @week %>
+      <div class="flex gap-0.5 rounded-full bg-chloro-950 p-[3px]">
+        <% @week.roles.each do |role, dish| %>
+          <%= link_to role, dish_path(dish.key),
+                class: "flex h-[38px] min-w-[44px] items-center justify-center rounded-full px-1 text-sm #{dish == @dish ? 'bg-white font-extrabold text-chloro-900' : 'font-semibold text-chloro-200 hover:text-white'}" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
   <p class="text-[10px] font-bold uppercase tracking-widest text-chloro-200">
     <%= Menu::Calendar.label_for(@dish.season) %> · semaine <%= @dish.week_number %> · plat <%= @dish.letter %> · <%= @dish.storage_label %>
   </p>
