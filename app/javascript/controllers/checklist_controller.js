@@ -4,7 +4,7 @@ import { Controller } from "@hotwired/stimulus"
 // rechargement pendant les courses. L'état "coché" n'a pas de couleur propre :
 // opacité + barré seulement, pour ne pas créer un second accent à côté du zest.
 export default class extends Controller {
-  static targets = ["item", "count"]
+  static targets = ["item", "count", "bar"]
   static values = { storageKey: String }
 
   connect() {
@@ -24,6 +24,8 @@ export default class extends Controller {
 
   apply(el) {
     const on = !!this.checked[el.dataset.key]
+    el.classList.toggle("bg-ash-100", on)
+    el.classList.toggle("bg-white", !on)
     el.querySelectorAll("[data-checklist-strike]").forEach((n) => {
       n.classList.toggle("line-through", on)
       n.classList.toggle("text-ash-500", on)
@@ -38,10 +40,12 @@ export default class extends Controller {
   }
 
   updateCount() {
-    if (!this.hasCountTarget) return
     const total = this.itemTargets.length
     const done = this.itemTargets.filter((el) => this.checked[el.dataset.key]).length
-    this.countTargets.forEach((t) => { t.textContent = `${done} / ${total}` })
+    this.countTargets.forEach((t) => { t.textContent = String(done) })
+    if (this.hasBarTarget && total > 0) {
+      this.barTargets.forEach((b) => { b.style.width = `${Math.round((done / total) * 100)}%` })
+    }
   }
 
   load() {

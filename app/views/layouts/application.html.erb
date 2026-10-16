@@ -79,26 +79,29 @@
     </header>
 
     <% unless suppress_mobile_header %>
-      <header class="sticky top-0 z-20 flex items-center justify-between gap-3 bg-chloro-700 px-4 py-3 lg:hidden">
-        <% if mobile_title %>
-          <span class="flex flex-col">
-            <span class="text-[15px] font-extrabold tracking-tight text-white"><%= mobile_title %></span>
-            <% if mobile_subtitle %><span class="text-[9px] font-semibold uppercase tracking-widest text-chloro-200"><%= mobile_subtitle %></span><% end %>
-          </span>
-        <% else %>
-          <%= link_to root_path, class: "flex items-center gap-2" do %>
-            <%= render "shared/mark" %>
-            <span class="font-extrabold tracking-tight text-white">COOK IT <span class="text-zest-400">GREEN</span></span>
-          <% end %>
-        <% end %>
-        <span class="flex items-center gap-2.5">
-          <% if mobile_kcal && (t = NutritionTarget.current) %>
-            <span class="text-right text-[11px] font-bold tabular-nums leading-tight text-zest-400">
-              <%= kcal t.floor_kcal %><br><span class="font-medium text-chloro-200">kcal cible</span>
+      <header class="sticky top-0 z-20 flex flex-col gap-2.5 bg-chloro-700 px-4 py-3 lg:hidden">
+        <div class="flex items-center justify-between gap-3">
+          <% if mobile_title %>
+            <span class="flex flex-col">
+              <span class="text-[15px] font-extrabold tracking-tight text-white"><%= mobile_title %></span>
+              <% if mobile_subtitle %><span class="text-[9px] font-semibold uppercase tracking-widest text-chloro-200"><%= mobile_subtitle %></span><% end %>
             </span>
+          <% else %>
+            <%= link_to root_path, class: "flex items-center gap-2" do %>
+              <%= render "shared/mark" %>
+              <span class="font-extrabold tracking-tight text-white">COOK IT <span class="text-zest-400">GREEN</span></span>
+            <% end %>
           <% end %>
-          <% if mobile_settings %><%= render "shared/settings_menu" %><% end %>
-        </span>
+          <span class="flex items-center gap-2.5">
+            <% if mobile_kcal && (t = NutritionTarget.current) %>
+              <span class="text-right text-[11px] font-bold tabular-nums leading-tight text-zest-400">
+                <%= kcal t.floor_kcal %><br><span class="font-medium text-chloro-200">kcal cible</span>
+              </span>
+            <% end %>
+            <% if mobile_settings %><%= render "shared/settings_menu" %><% end %>
+          </span>
+        </div>
+        <%= yield :mobile_header_extra if content_for?(:mobile_header_extra) %>
       </header>
     <% end %>
 

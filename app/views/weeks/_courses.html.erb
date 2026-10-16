@@ -29,20 +29,28 @@
 </div>
 
 <%# Mobile : liste continue, en-têtes de rayon collants, cases à cocher persistées (2e). %>
+<%# La barre de progression vit sous le header réel (même portée de contrôleur Stimulus
+    que la liste, sticky juste en dessous) plutôt que dans le header lui-même : deux
+    instances du contrôleur ne partageraient pas leur état. %>
 <div class="-mx-5 lg:hidden" data-controller="checklist" data-checklist-storage-key-value="courses:<%= week.number %>">
-  <p class="mb-3 px-5 text-xs font-semibold tabular-nums text-ash-500">
-    <span data-checklist-target="count">0 / <%= total_lines %></span> articles cochés
-  </p>
+  <div class="sticky top-[52px] z-20 flex items-center justify-between gap-3 bg-chloro-800 px-5 py-2.5">
+    <div class="h-[6px] flex-1 overflow-hidden rounded-full bg-chloro-900">
+      <div data-checklist-target="bar" class="h-full rounded-full bg-zest-400" style="width: 0%"></div>
+    </div>
+    <span class="flex-none text-[13px] font-bold tabular-nums text-white">
+      <span data-checklist-target="count">0</span>/<%= total_lines %>
+    </span>
+  </div>
   <% week.shopping_list.each do |aisle, lines| %>
     <div>
-      <div class="sticky top-[52px] z-10 flex items-center justify-between bg-chloro-700 px-5 py-2">
+      <div class="sticky top-[91px] z-10 flex items-center justify-between bg-chloro-700 px-5 py-2">
         <span class="text-[11px] font-bold uppercase tracking-widest text-white"><%= aisle %></span>
         <span class="text-[11px] font-semibold tabular-nums text-chloro-200"><%= lines.size %></span>
       </div>
       <% lines.each do |line| %>
         <button type="button" data-action="click->checklist#toggle" data-key="<%= aisle %>|<%= line.ingredient.key %>" data-checklist-target="item"
-                class="flex min-h-16 w-full items-center gap-3.5 border-b border-ash-100 bg-white px-5 py-2.5 text-left">
-          <span data-checklist-box class="flex h-6 w-6 flex-none items-center justify-center rounded-full border-[1.5px] border-ash-300 bg-white text-xs font-bold text-white"></span>
+                class="flex min-h-16 w-full items-center gap-3.5 border-b border-ash-100 px-5 py-2.5 text-left">
+          <span data-checklist-box class="flex h-6 w-6 flex-none items-center justify-center rounded-md border-[1.5px] border-ash-500 bg-white text-xs font-bold text-white"></span>
           <span data-checklist-strike class="flex-1">
             <span class="block text-[15px] leading-tight text-ash-900"><%= line.ingredient.name %></span>
             <% if line.note %><span class="block text-xs text-ash-500"><%= line.note %></span><% end %>
