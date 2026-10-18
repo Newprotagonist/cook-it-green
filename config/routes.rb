@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resource :session, only: %i[new create destroy]
+
   root "weeks#index"
 
   resources :weeks, only: %i[index show], param: :number

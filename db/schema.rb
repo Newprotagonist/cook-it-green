@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_155013) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_162032) do
   create_table "activity_levels", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -153,6 +153,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_155013) do
     t.decimal "protein_margin", precision: 6, scale: 4, default: "1.0171", null: false
     t.datetime "resolved_at"
     t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.index ["user_id"], name: "index_nutrition_targets_on_user_id"
   end
 
   create_table "profiles", force: :cascade do |t|
@@ -164,9 +166,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_155013) do
     t.decimal "height_cm", precision: 5, scale: 1
     t.string "sex", default: "male", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.decimal "weight_kg", precision: 5, scale: 1
     t.index ["activity_level_id"], name: "index_profiles_on_activity_level_id"
     t.index ["goal_id"], name: "index_profiles_on_goal_id"
+    t.index ["user_id"], name: "index_profiles_on_user_id"
   end
 
   create_table "push_subscriptions", force: :cascade do |t|
@@ -176,7 +180,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_155013) do
     t.string "p256dh_key", null: false
     t.datetime "updated_at", null: false
     t.string "user_agent"
+    t.integer "user_id"
     t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
   end
 
   create_table "resolved_dishes", force: :cascade do |t|
@@ -237,6 +243,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_155013) do
     t.index ["season", "position"], name: "index_seasonal_fruits_on_season_and_position", unique: true
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email_address", null: false
+    t.string "password_digest", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+  end
+
   create_table "week_patterns", force: :cascade do |t|
     t.integer "breakfast_position", null: false
     t.datetime "created_at", null: false
@@ -255,11 +278,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_155013) do
   add_foreign_key "fixed_meal_components", "fixed_meals"
   add_foreign_key "fixed_meal_components", "ingredients"
   add_foreign_key "meal_shares", "nutrition_targets"
+  add_foreign_key "nutrition_targets", "users"
   add_foreign_key "profiles", "activity_levels"
   add_foreign_key "profiles", "goals"
+  add_foreign_key "profiles", "users"
+  add_foreign_key "push_subscriptions", "users"
   add_foreign_key "resolved_dishes", "dishes"
   add_foreign_key "resolved_dishes", "nutrition_targets"
   add_foreign_key "resolved_fixed_meals", "fixed_meals"
   add_foreign_key "resolved_fixed_meals", "nutrition_targets"
   add_foreign_key "seasonal_fruits", "ingredients"
+  add_foreign_key "sessions", "users"
 end

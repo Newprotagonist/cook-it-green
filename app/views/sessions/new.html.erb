@@ -1,0 +1,27 @@
+<% content_for :title, "Cook It Green — Connexion" %>
+
+<div class="w-full max-w-sm">
+  <div class="mb-8 flex items-center justify-center gap-2">
+    <%= render "shared/mark" %>
+    <span class="text-xl font-extrabold tracking-tight text-white">COOK IT <span class="text-zest-400">GREEN</span></span>
+  </div>
+
+  <% if alert %>
+    <p class="mb-5 rounded-lg border border-amber-700 bg-amber-950 px-4 py-2.5 text-sm text-amber-200"><%= alert %></p>
+  <% end %>
+
+  <%= form_with url: session_path, class: "space-y-4" do |f| %>
+    <div>
+      <label class="mb-1.5 block text-[11px] font-bold uppercase tracking-widest text-chloro-300">Identifiant</label>
+      <%= f.email_field :email_address, required: true, autofocus: true, autocomplete: "username",
+            class: "w-full rounded-lg border-0 bg-chloro-900 px-4 py-3 text-[15px] text-white placeholder:text-chloro-400 focus:outline focus:outline-2 focus:outline-zest-400" %>
+    </div>
+    <div>
+      <label class="mb-1.5 block text-[11px] font-bold uppercase tracking-widest text-chloro-300">Mot de passe</label>
+      <%= f.password_field :password, required: true, autocomplete: "current-password",
+            class: "w-full rounded-lg border-0 bg-chloro-900 px-4 py-3 text-[15px] text-white placeholder:text-chloro-400 focus:outline focus:outline-2 focus:outline-zest-400" %>
+    </div>
+    <%= f.submit "Se connecter",
+          class: "mt-2 h-12 w-full rounded-lg bg-white text-[15px] font-bold text-chloro-950 hover:bg-chloro-100" %>
+  <% end %>
+</div>

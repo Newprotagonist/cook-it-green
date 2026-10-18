@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <title><%= content_for(:title) || "Cook It Green" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#052110">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= tag.link rel: "icon", href: versioned_icon_path("icon-192.png"), type: "image/png" %>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="flex min-h-screen items-center justify-center bg-chloro-950 px-5">
+    <%= yield %>
+  </body>
+</html>
