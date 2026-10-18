@@ -29,8 +29,6 @@ env:
     SOLID_QUEUE_IN_PUMA: true
   secret:
     - RAILS_MASTER_KEY
-    - BASIC_AUTH_USER
-    - BASIC_AUTH_PASSWORD
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"
