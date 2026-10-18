@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_162032) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_163942) do
   create_table "activity_levels", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -153,7 +153,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_162032) do
     t.decimal "protein_margin", precision: 6, scale: 4, default: "1.0171", null: false
     t.datetime "resolved_at"
     t.datetime "updated_at", null: false
-    t.integer "user_id"
+    t.integer "user_id", null: false
     t.index ["user_id"], name: "index_nutrition_targets_on_user_id"
   end
 
@@ -166,7 +166,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_162032) do
     t.decimal "height_cm", precision: 5, scale: 1
     t.string "sex", default: "male", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id"
+    t.integer "user_id", null: false
     t.decimal "weight_kg", precision: 5, scale: 1
     t.index ["activity_level_id"], name: "index_profiles_on_activity_level_id"
     t.index ["goal_id"], name: "index_profiles_on_goal_id"
@@ -180,8 +180,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_162032) do
     t.string "p256dh_key", null: false
     t.datetime "updated_at", null: false
     t.string "user_agent"
-    t.integer "user_id"
-    t.index ["endpoint"], name: "index_push_subscriptions_on_endpoint", unique: true
+    t.integer "user_id", null: false
+    t.index ["user_id", "endpoint"], name: "index_push_subscriptions_on_user_id_and_endpoint", unique: true
     t.index ["user_id"], name: "index_push_subscriptions_on_user_id"
   end
 
