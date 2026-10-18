@@ -1,7 +1,8 @@
 # Cook It Green
 
 Menu vegan annuel calibré au gramme, en batch cooking : 16 semaines de rotation,
-48 plats, une session de cuisine de 3 h par semaine. PWA mono-utilisateur.
+48 plats, une session de cuisine de 3 h par semaine. PWA multi-utilisateur, sur
+invitation uniquement.
 
 Le dossier s'appelle encore `batch_cooking` sur disque — le nom définitif est décidé
 (« Cook It Green »), seul le renommage du dossier physique reste à faire à la main.
@@ -30,7 +31,11 @@ bin/setup          # bundle, base, seeds
 bin/dev            # Puma + Tailwind en watch, sur http://localhost:3000
 ```
 
-Identifiants de développement dans `.env` (non versionné) : `batch` / `cooking`.
+Compte de développement créé par le seed : `dev@example.com` / `password`. En
+production, chaque compte est créé par l'admin via `bin/rails
+"users:invite[email]"`, qui affiche un mot de passe généré une seule fois (à
+transmettre hors ligne — pas d'email, pas de lien de réinitialisation). Même
+commande sous `users:reset_password[email]` pour en régénérer un.
 
 Le seed charge `db/seeds/menu_definitions.json` : 127 ingrédients, 48 plats,
 6 recettes fixes, la rotation et les tables de référence. Il est idempotent.
@@ -62,11 +67,6 @@ d'où la pénalité ×40 sur les écarts négatifs.
 
 Extrait de Move the Spark et réappliqué ici :
 
-- **Pas de système de comptes** : ni modèle `User`, ni Devise. Un identifiant partagé
-  protège l'app via `http_basic_authenticate_with`, gardé par la présence de
-  `ENV["BASIC_AUTH_USER"]` et non par `Rails.env.production?`, pour que le même chemin
-  de code soit exerçable en local. Les routes internes à Rails (`/up`, manifeste,
-  service worker) n'héritent pas d'`ApplicationController` et restent joignables.
 - **Versionnage des icônes** : `ApplicationHelper::ICON_VERSION` ajouté en `?v=N` à
   chaque URL d'icône. Sans lui, les icônes mises à jour n'atteignent jamais les caches
   du navigateur, de l'OS, ni les notifications déjà envoyées.
@@ -91,6 +91,22 @@ Deux rappels, diffusés à tous les appareils enregistrés :
 | `Reminders::BatchSessionJob` | samedi à 10 h | session du lendemain, plats, et trempages à lancer le soir |
 
 Clés VAPID dans les credentials chiffrés, sous `vapid:`.
+
+## Comptes et données personnelles
+
+Pas d'inscription publique : l'admin crée chaque compte via `users:invite`, le
+mot de passe est transmis hors ligne. Chaque compte a son propre profil
+(âge, poids, taille, activité, objectif) et sa propre cible nutritionnelle —
+donc son propre menu résolu, puisque les grammages dépendent de la cible.
+Les recettes, la rotation des 16 semaines et les tables de référence restent
+communes à tous les comptes : ce sont des données éditoriales, pas des données
+personnelles.
+
+Ce qui est stocké par compte : adresse email, mot de passe haché (bcrypt),
+profil et cible nutritionnelle, abonnements aux notifications push. Rien
+d'autre n'est collecté (pas d'analytics, pas de tiers). Supprimer un compte
+(`user.destroy` en console) efface en cascade son profil, sa cible et ses
+abonnements push.
 
 ## Déploiement
 
