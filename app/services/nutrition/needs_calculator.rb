@@ -68,9 +68,7 @@ module Nutrition
     def carb_floor = profile.weight_kg.to_f * settings.min_carb_g_per_kg.to_f
 
     def target_attributes
-      { kcal: kcal, protein: protein, lipid: lipid_adjusted, carb: carb, fiber: fiber,
-        source: "computed",
-        name: "Besoins calculés — #{profile.goal.name.downcase}, #{Date.current.strftime('%d/%m/%Y')}" }
+      { kcal: kcal, protein: protein, lipid: lipid_adjusted, carb: carb, fiber: fiber }
     end
 
     def summary

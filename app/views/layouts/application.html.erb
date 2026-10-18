@@ -65,11 +65,11 @@
         <div class="flex gap-5 text-sm text-chloro-100">
           <%= link_to "Semaines", weeks_path, class: "hover:text-white" %>
           <%= link_to "Profil & besoins", profile_path, class: "hover:text-white" %>
-          <%= link_to "Cibles", nutrition_targets_path, class: "hover:text-white" %>
+          <%= link_to "Cibles", nutrition_target_path, class: "hover:text-white" %>
         </div>
         <% if (t = NutritionTarget.current) %>
           <span class="ml-auto text-xs tabular-nums text-zest-400">
-            <%= t.name %> · <%= kcal t.floor_kcal %> kcal ·
+            <%= kcal t.floor_kcal %> kcal ·
             P<%= t.protein.to_i %> L<%= t.lipid.to_i %> G<%= t.carb.to_i %> F<%= t.fiber.to_i %>
             <% unless t.resolved? %><span class="text-amber-300">· non résolue</span><% end %>
           </span>

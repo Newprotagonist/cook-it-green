@@ -126,7 +126,6 @@ class Menu::InvariantTest < MenuTestCase
   # vérifie que le filet détecte bien une cible que le menu ne peut pas tenir.
   test "une cible hors de portée est détectée, pas passée sous silence" do
     impossible = NutritionTarget.create!(
-      name: "Cible impossible (test)", source: "manual",
       kcal: 3800, protein: 240, lipid: 120, carb: 400, fiber: 40,
       protein_margin: 1.0171, lipid_margin: 1.0054, carb_margin: 1.0,
       meal_shares_attributes: target.meal_shares.map { |s|

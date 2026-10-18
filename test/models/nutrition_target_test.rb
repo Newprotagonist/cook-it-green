@@ -8,7 +8,6 @@ class NutritionTargetTest < SeededTestCase
 
   test "refuse une répartition dont la somme n'est pas 1" do
     t = target.dup
-    t.name = "Cassée"
     t.meal_shares.build(slot: "breakfast", servings_per_day: 1,
                         protein_share: 0.5, lipid_share: 0.5, carb_share: 0.5)
     assert_not t.valid?
@@ -30,12 +29,5 @@ class NutritionTargetTest < SeededTestCase
     share = target.meal_shares.find { |s| s.slot == "dish" }
     expected = target.protein.to_f * target.protein_margin.to_f * share.protein_share.to_f
     assert_in_delta expected, target.slot_target("dish")[:protein], 0.001
-  end
-
-  test "une seule cible active à la fois" do
-    other = NutritionTarget.where.not(id: target.id).first
-    other.update!(active: true)
-    assert_equal 1, NutritionTarget.where(active: true).count
-    assert_equal other.id, NutritionTarget.current.id
   end
 end

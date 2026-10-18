@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_03_210010) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_155013) do
   create_table "activity_levels", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -142,7 +142,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_03_210010) do
   end
 
   create_table "nutrition_targets", force: :cascade do |t|
-    t.boolean "active", default: false, null: false
     t.decimal "carb", precision: 6, scale: 1, null: false
     t.decimal "carb_margin", precision: 6, scale: 4, default: "1.0", null: false
     t.datetime "created_at", null: false
@@ -150,13 +149,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_03_210010) do
     t.integer "kcal", null: false
     t.decimal "lipid", precision: 6, scale: 1, null: false
     t.decimal "lipid_margin", precision: 6, scale: 4, default: "1.0054", null: false
-    t.string "name", null: false
     t.decimal "protein", precision: 6, scale: 1, null: false
     t.decimal "protein_margin", precision: 6, scale: 4, default: "1.0171", null: false
     t.datetime "resolved_at"
-    t.string "source", default: "manual", null: false
     t.datetime "updated_at", null: false
-    t.index ["active"], name: "index_nutrition_targets_on_active"
   end
 
   create_table "profiles", force: :cascade do |t|

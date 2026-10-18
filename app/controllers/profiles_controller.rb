@@ -2,8 +2,6 @@ class ProfilesController < ApplicationController
   def show
     @profile = Profile.current
     @needs = @profile.needs if @profile.complete? && @profile.goal && @profile.activity_level
-    @target = NutritionTarget.current
-    @targets = NutritionTarget.order(:created_at)
   end
 
   def update
@@ -12,8 +10,6 @@ class ProfilesController < ApplicationController
       redirect_to profile_path, notice: "Profil mis à jour."
     else
       @needs = nil
-      @target = NutritionTarget.current
-      @targets = NutritionTarget.order(:created_at)
       render :show, status: :unprocessable_entity
     end
   end

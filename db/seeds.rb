@@ -126,24 +126,23 @@ FRACTIONS = DEF["meta"]["fractions"]
 MARGIN    = DEF["meta"]["marge"]
 SLOTS = [ [ "breakfast", "petit_dej", 1 ], [ "dish", "plat", 2 ], [ "snack", "collation", 1 ] ].freeze
 
-DEF["presets"].each_with_index do |preset, index|
-  target = NutritionTarget.find_or_initialize_by(name: preset["nom"])
-  target.assign_attributes(
-    active: index.zero?, source: "preset",
-    kcal: preset["cible"]["kcal"], protein: preset["cible"]["P"],
-    lipid: preset["cible"]["L"], carb: preset["cible"]["G"], fiber: preset["cible"]["F"],
-    protein_margin: MARGIN["P"], lipid_margin: MARGIN["L"], carb_margin: MARGIN["G"]
-  )
-  target.save!(validate: false)
-  target.meal_shares.destroy_all
-  SLOTS.each_with_index do |(slot, source_key, servings), position|
-    f = FRACTIONS[source_key]
-    target.meal_shares.create!(slot: slot, servings_per_day: servings, position: position,
-                               protein_share: f["P"], lipid_share: f["L"], carb_share: f["G"])
-  end
-  target.reload.validate!
+# Cible unique (singleton, comme Profile) : seul le premier preset sert à l'initialiser.
+preset = DEF["presets"].first
+target = NutritionTarget.first_or_initialize
+target.assign_attributes(
+  kcal: preset["cible"]["kcal"], protein: preset["cible"]["P"],
+  lipid: preset["cible"]["L"], carb: preset["cible"]["G"], fiber: preset["cible"]["F"],
+  protein_margin: MARGIN["P"], lipid_margin: MARGIN["L"], carb_margin: MARGIN["G"]
+)
+target.save!(validate: false)
+target.meal_shares.destroy_all
+SLOTS.each_with_index do |(slot, source_key, servings), position|
+  f = FRACTIONS[source_key]
+  target.meal_shares.create!(slot: slot, servings_per_day: servings, position: position,
+                             protein_share: f["P"], lipid_share: f["L"], carb_share: f["G"])
 end
-say.("#{NutritionTarget.count} cibles, #{MealShare.count} répartitions")
+target.reload.validate!
+say.("#{NutritionTarget.count} cible, #{MealShare.count} répartitions")
 
 # ------------------------------------------------------------------- rotation
 DEF["pattern"].each_with_index do |(lunch, dinner), day|
@@ -160,4 +159,4 @@ DEF["portions"].each do |role, count|
 end
 say.("#{WeekPattern.count} jours de rotation, #{RolePortion.count} rôles")
 
-puts "\nSeed terminé. Cible active : #{NutritionTarget.current&.name}"
+puts "\nSeed terminé. Cible : #{NutritionTarget.current&.floor_kcal&.round} kcal"

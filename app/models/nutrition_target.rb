@@ -1,9 +1,8 @@
-# La cible quotidienne. Chaque enregistrement porte ses quatre minimums,
-# ses marges d'arrondi et sa répartition sur la journée : changer d'objectif
-# revient à créer ou modifier une ligne, jamais à toucher au code.
+# La cible quotidienne — un singleton, comme Profile : une seule ligne, ses quatre
+# minimums, ses marges d'arrondi et sa répartition sur la journée. La modifier
+# revient à changer cette ligne, jamais à toucher au code.
 class NutritionTarget < ApplicationRecord
-  SOURCES = %w[manual computed preset].freeze
-  MACROS  = %i[protein lipid carb fiber].freeze
+  MACROS = %i[protein lipid carb fiber].freeze
 
   has_many :meal_shares, -> { order(:position) }, dependent: :destroy
   has_many :resolved_dishes, dependent: :destroy
@@ -11,19 +10,11 @@ class NutritionTarget < ApplicationRecord
 
   accepts_nested_attributes_for :meal_shares
 
-  validates :name, presence: true
   validates :protein, :lipid, :carb, :fiber,
             numericality: { greater_than: 0 }
-  validates :source, inclusion: { in: SOURCES }
   validate  :shares_sum_to_one
 
-  after_save :ensure_single_active, if: :saved_change_to_active?
-
-  scope :active, -> { where(active: true) }
-
-  def self.current
-    active.first || order(created_at: :desc).first
-  end
+  def self.current = first
 
   # Le plancher calorique imposé par les quatre minimums, convention française.
   def floor_kcal
@@ -63,10 +54,5 @@ class NutritionTarget < ApplicationRecord
       next if (total - 1.0).abs < 0.005
       errors.add(:meal_shares, "#{attr} : la somme fait #{total.round(4)} au lieu de 1")
     end
-  end
-
-  def ensure_single_active
-    return unless active?
-    self.class.where.not(id: id).update_all(active: false)
   end
 end

@@ -16,7 +16,7 @@
   <% unless @target&.resolved? %>
     <p class="mb-6 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
       Aucune cible résolue pour l'instant.
-      <%= link_to "Lancez un recalcul", nutrition_targets_path, class: "underline" %> pour générer les grammages.
+      <%= link_to "Lancez un recalcul", nutrition_target_path, class: "underline" %> pour générer les grammages.
     </p>
   <% end %>
 
@@ -85,7 +85,7 @@
 <% unless @target&.resolved? %>
   <p class="mt-5 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 lg:hidden">
     Aucune cible résolue pour l'instant.
-    <%= link_to "Lancez un recalcul", nutrition_targets_path, class: "underline" %> pour générer les grammages.
+    <%= link_to "Lancez un recalcul", nutrition_target_path, class: "underline" %> pour générer les grammages.
   </p>
 <% end %>
 

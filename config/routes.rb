@@ -5,12 +5,9 @@ Rails.application.routes.draw do
   resources :dishes, only: :show, param: :key
 
   resource :profile, only: %i[show update]
-  resources :nutrition_targets, path: "cibles", only: %i[index create update] do
-    member do
-      post :activate
-      post :recalculate
-    end
-    collection { post :from_profile }
+  resource :nutrition_target, path: "cibles", only: %i[show update] do
+    post :recalculate
+    post :from_profile
   end
 
   resource :push_subscription, only: %i[create destroy]
