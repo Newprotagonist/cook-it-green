@@ -30,4 +30,18 @@ class NutritionTargetTest < SeededTestCase
     expected = target.protein.to_f * target.protein_margin.to_f * share.protein_share.to_f
     assert_in_delta expected, target.slot_target("dish")[:protein], 0.001
   end
+
+  test "deux utilisateurs ont des cibles et des grammages résolus indépendants" do
+    other = User.create!(email_address: "other@example.com", password: "password")
+    other_target = other.build_nutrition_target(target.attributes.slice(
+      "kcal", "protein", "lipid", "carb", "fiber", "protein_margin", "lipid_margin", "carb_margin"))
+    other_target.protein = target.protein.to_f + 20 # une cible différente de celle du propriétaire
+    other_target.save!(validate: false)
+    target.meal_shares.each do |s|
+      other_target.meal_shares.create!(s.attributes.except("id", "nutrition_target_id", "created_at", "updated_at"))
+    end
+
+    assert_not_equal target.id, other.nutrition_target.id
+    assert_not_equal target.protein, other.nutrition_target.protein
+  end
 end

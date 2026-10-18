@@ -1,5 +1,5 @@
 class NutritionTargetsController < ApplicationController
-  before_action :set_target
+  before_action :set_target, except: :from_profile
 
   def show
   end
@@ -13,13 +13,15 @@ class NutritionTargetsController < ApplicationController
     end
   end
 
-  # Reprend les besoins calculés depuis le profil et les applique à la cible.
+  # Reprend les besoins calculés depuis le profil et les applique à la cible —
+  # la crée si l'utilisateur n'en a pas encore une.
   def from_profile
-    needs = Profile.current.needs
+    needs = current_user.profile.needs
     unless needs.usable?
       return redirect_to profile_path, alert: "Complétez le profil (âge, poids, taille, activité, objectif)."
     end
 
+    @target = current_user.nutrition_target || current_user.build_nutrition_target
     @target.update!(needs.target_attributes)
     redirect_to nutrition_target_path, notice: "Besoins appliqués à votre cible."
   end
@@ -40,7 +42,13 @@ class NutritionTargetsController < ApplicationController
 
   private
 
-  def set_target = @target = NutritionTarget.current
+  # Pas de création à la volée ici : une cible sans profil renseigné n'a pas de
+  # sens (ses quatre macros doivent être > 0). Seul from_profile a le droit d'en
+  # créer une, à partir de besoins effectivement calculés.
+  def set_target
+    @target = current_user.nutrition_target
+    redirect_to profile_path, alert: "Complétez d'abord votre profil pour créer une cible." unless @target
+  end
 
   def target_params
     params.require(:nutrition_target).permit(:kcal, :protein, :lipid, :carb, :fiber,

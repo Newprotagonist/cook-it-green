@@ -5,25 +5,28 @@ module Reminders
     queue_as :default
 
     def perform(date = Date.current)
-      target = NutritionTarget.current
-      return unless target&.resolved?
+      User.find_each do |user|
+        target = user.nutrition_target
+        next unless target&.resolved?
 
-      tomorrow = date.tomorrow
-      number = Menu::Calendar.current_week_number(tomorrow)
-      return unless number
+        tomorrow = date.tomorrow
+        number = Menu::Calendar.current_week_number(tomorrow)
+        next unless number
 
-      day = Menu::Week.new(target, number).days.find { |d| d.index == tomorrow.cwday - 1 }
-      return unless day&.from_freezer
+        day = Menu::Week.new(target, number).days.find { |d| d.index == tomorrow.cwday - 1 }
+        next unless day&.from_freezer
 
-      dishes = [ day.lunch&.dish&.name, day.dinner&.dish&.name ].compact.uniq
-      return if dishes.empty?
+        dishes = [ day.lunch&.dish&.name, day.dinner&.dish&.name ].compact.uniq
+        next if dishes.empty?
 
-      PushSubscription.broadcast(
-        title: "Sortez les portions de demain",
-        body: "#{dishes.to_sentence} — au réfrigérateur ce soir pour #{day.name.downcase}.",
-        url: "/weeks/#{number}",
-        tag: "freezer-#{tomorrow.iso8601}"
-      )
+        PushSubscription.broadcast(
+          user: user,
+          title: "Sortez les portions de demain",
+          body: "#{dishes.to_sentence} — au réfrigérateur ce soir pour #{day.name.downcase}.",
+          url: "/weeks/#{number}",
+          tag: "freezer-#{tomorrow.iso8601}"
+        )
+      end
     end
   end
 end

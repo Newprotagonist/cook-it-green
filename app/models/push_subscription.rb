@@ -1,16 +1,19 @@
 class PushSubscription < ApplicationRecord
-  validates :endpoint, presence: true, uniqueness: true
+  belongs_to :user
+
+  validates :endpoint, presence: true, uniqueness: { scope: :user_id }
   validates :p256dh_key, :auth_key, presence: true
 
-  # Diffuse à tous les appareils enregistrés et élague les abonnements morts.
-  def self.broadcast(title:, body:, url: "/", tag: nil)
+  # Diffuse à tous les appareils enregistrés d'un utilisateur et élague les
+  # abonnements morts.
+  def self.broadcast(user:, title:, body:, url: "/", tag: nil)
     payload = {
       title: title, body: body, url: url, tag: tag,
       icon: ApplicationController.helpers.versioned_icon_path("icon-192.png"),
       badge: ApplicationController.helpers.versioned_icon_path("badge-96.png")
     }.compact
 
-    find_each do |sub|
+    user.push_subscriptions.find_each do |sub|
       begin
         WebPush.payload_send(
           message: JSON.generate(payload),

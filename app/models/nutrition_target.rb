@@ -1,9 +1,10 @@
-# La cible quotidienne — un singleton, comme Profile : une seule ligne, ses quatre
-# minimums, ses marges d'arrondi et sa répartition sur la journée. La modifier
-# revient à changer cette ligne, jamais à toucher au code.
+# La cible quotidienne — un singleton par utilisateur, comme Profile : une seule
+# ligne par compte, ses quatre minimums, ses marges d'arrondi et sa répartition
+# sur la journée. La modifier revient à changer cette ligne, jamais à toucher au code.
 class NutritionTarget < ApplicationRecord
   MACROS = %i[protein lipid carb fiber].freeze
 
+  belongs_to :user
   has_many :meal_shares, -> { order(:position) }, dependent: :destroy
   has_many :resolved_dishes, dependent: :destroy
   has_many :resolved_fixed_meals, dependent: :destroy
@@ -13,8 +14,6 @@ class NutritionTarget < ApplicationRecord
   validates :protein, :lipid, :carb, :fiber,
             numericality: { greater_than: 0 }
   validate  :shares_sum_to_one
-
-  def self.current = first
 
   # Le plancher calorique imposé par les quatre minimums, convention française.
   def floor_kcal

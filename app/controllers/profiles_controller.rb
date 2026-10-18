@@ -1,11 +1,11 @@
 class ProfilesController < ApplicationController
   def show
-    @profile = Profile.current
+    @profile = current_user.profile
     @needs = @profile.needs if @profile.complete? && @profile.goal && @profile.activity_level
   end
 
   def update
-    @profile = Profile.current
+    @profile = current_user.profile
     if @profile.update(profile_params)
       redirect_to profile_path, notice: "Profil mis à jour."
     else

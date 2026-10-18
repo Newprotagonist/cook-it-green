@@ -67,7 +67,7 @@
           <%= link_to "Profil & besoins", profile_path, class: "hover:text-white" %>
           <%= link_to "Cibles", nutrition_target_path, class: "hover:text-white" %>
         </div>
-        <% if (t = NutritionTarget.current) %>
+        <% if (t = current_user&.nutrition_target) %>
           <span class="ml-auto text-xs tabular-nums text-zest-400">
             <%= kcal t.floor_kcal %> kcal ·
             P<%= t.protein.to_i %> L<%= t.lipid.to_i %> G<%= t.carb.to_i %> F<%= t.fiber.to_i %>
@@ -92,7 +92,7 @@
             <% end %>
           <% end %>
           <span class="flex items-center gap-2.5">
-            <% if mobile_kcal && (t = NutritionTarget.current) %>
+            <% if mobile_kcal && (t = current_user&.nutrition_target) %>
               <span class="text-right text-[11px] font-bold tabular-nums leading-tight text-zest-400">
                 <%= kcal t.floor_kcal %><br><span class="font-medium text-chloro-200">kcal cible</span>
               </span>

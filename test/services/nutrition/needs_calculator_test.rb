@@ -2,7 +2,7 @@ require "test_helper"
 
 class Nutrition::NeedsCalculatorTest < SeededTestCase
   setup do
-    @profile = Profile.current
+    @profile = owner.profile
     @profile.update!(sex: "male", age: 35, weight_kg: 70, height_cm: 178, body_fat_pct: nil,
                      activity_level: ActivityLevel.find_by!(key: "modere"),
                      goal: Goal.find_by!(key: "perte"))

@@ -117,18 +117,24 @@ DEF["objectifs"].each_with_index do |row, index|
 end
 say.("#{ActivityLevel.count} niveaux d'activité, #{Goal.count} objectifs")
 
-Profile.current.update!(sex: "male", age: 35, weight_kg: 70, height_cm: 178,
-                        activity_level: ActivityLevel.find_by(key: "modere"),
-                        goal: Goal.find_by(key: "perte"))
+# Utilisateur de dev : mot de passe connu, pour se connecter en local sans
+# passer par la tâche rake (en prod, les comptes se créent uniquement via
+# `users:invite`). Profile.current n'existe plus — chaque compte a le sien,
+# créé automatiquement à la création de l'utilisateur (User#create_profile!).
+owner = User.find_or_create_by!(email_address: "dev@example.com") { |u| u.password = "password" }
+owner.profile.update!(sex: "male", age: 35, weight_kg: 70, height_cm: 178,
+                      activity_level: ActivityLevel.find_by(key: "modere"),
+                      goal: Goal.find_by(key: "perte"))
 
 # ---------------------------------------------------------------------- cibles
 FRACTIONS = DEF["meta"]["fractions"]
 MARGIN    = DEF["meta"]["marge"]
 SLOTS = [ [ "breakfast", "petit_dej", 1 ], [ "dish", "plat", 2 ], [ "snack", "collation", 1 ] ].freeze
 
-# Cible unique (singleton, comme Profile) : seul le premier preset sert à l'initialiser.
+# Cible unique de l'utilisateur de dev (singleton par compte, comme Profile) :
+# seul le premier preset sert à l'initialiser.
 preset = DEF["presets"].first
-target = NutritionTarget.first_or_initialize
+target = owner.nutrition_target || owner.build_nutrition_target
 target.assign_attributes(
   kcal: preset["cible"]["kcal"], protein: preset["cible"]["P"],
   lipid: preset["cible"]["L"], carb: preset["cible"]["G"], fiber: preset["cible"]["F"],
@@ -159,4 +165,5 @@ DEF["portions"].each do |role, count|
 end
 say.("#{WeekPattern.count} jours de rotation, #{RolePortion.count} rôles")
 
-puts "\nSeed terminé. Cible : #{NutritionTarget.current&.floor_kcal&.round} kcal"
+puts "\nSeed terminé. Compte de dev : #{owner.email_address} / password. " \
+     "Cible : #{owner.nutrition_target&.floor_kcal&.round} kcal"
