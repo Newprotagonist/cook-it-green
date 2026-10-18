@@ -1,11 +1,15 @@
 # Cook It Green
 
 Menu vegan annuel calibré au gramme, en batch cooking : 16 semaines de rotation,
-48 plats, une session de cuisine de 3 h par semaine. PWA multi-utilisateur, sur
-invitation uniquement.
+48 plats, une session de cuisine de 3 h par semaine. Un solveur détermine le
+grammage exact de chaque recette pour atteindre des cibles nutritionnelles
+personnelles — l'app résout un vrai problème de contraintes, pas un simple
+calendrier de recettes.
 
-Le dossier s'appelle encore `batch_cooking` sur disque — le nom définitif est décidé
-(« Cook It Green »), seul le renommage du dossier physique reste à faire à la main.
+**En ligne :** [cookitgreen.com](https://cookitgreen.com) — PWA multi-utilisateur,
+sur invitation uniquement.
+
+![Connexion](docs/screenshots/connexion.jpg)
 
 ## Le principe
 
@@ -19,10 +23,54 @@ des besoins, les bornes de grammage et la rotation hebdomadaire sont **des enreg
 en base**. Changer d'objectif se fait dans l'interface, puis un recalcul régénère les
 48 plats et les 24 recettes fixes en ~800 ms.
 
+![Rotation annuelle](docs/screenshots/rotation-annuelle.jpg)
+
+Le solveur parcourt **toute** la grille des grammages admissibles au pas de 5 g plutôt
+que de résoudre un système linéaire : l'espace est assez petit pour ça, et l'optimum
+est garanti même quand un levier sature sa borne — cas où une résolution linéaire
+produit des solutions absurdes (glucides à +46 g sur un seul plat). Les cibles sont des
+**minimums** : passer dessous est bien plus grave que dépasser, d'où la pénalité ×40 sur
+les écarts négatifs.
+
+![Plat et ses leviers](docs/screenshots/plat-solveur.jpg)
+
+## Une semaine type
+
+Chaque semaine affiche le planning des 7 jours, la fiche de chaque plat (grammages,
+macros, méthode), la liste de courses agrégée, et le déroulé de la session de batch
+cooking de 3 h — dans l'ordre où les tâches doivent réellement s'enchaîner (ce qui cuit
+sans surveillance part en premier).
+
+![Planning de la semaine](docs/screenshots/planning-semaine.jpg)
+
+![Liste de courses](docs/screenshots/liste-courses.jpg)
+
+![Session de batch cooking](docs/screenshots/session-batch.jpg)
+
 ## Convention nutritionnelle
 
 Convention française, celle des étiquettes européennes : **les glucides sont donnés hors
 fibres**, et `kcal = 4P + 9L + 4G + 2F`. Valeurs Ciqual 2020 (ANSES) et USDA FoodData Central.
+
+## Multi-utilisateur, sur invitation
+
+Pas d'inscription publique : l'admin crée chaque compte via `users:invite`, le
+mot de passe est transmis hors ligne. Chaque compte a son propre profil
+(âge, poids, taille, activité, objectif) et sa propre cible nutritionnelle —
+donc son propre menu résolu, puisque les grammages dépendent de la cible.
+Les recettes, la rotation des 16 semaines et les tables de référence restent
+communes à tous les comptes : ce sont des données éditoriales, pas des données
+personnelles.
+
+![Profil](docs/screenshots/profil.jpg)
+
+![Cibles nutritionnelles](docs/screenshots/cibles.jpg)
+
+Ce qui est stocké par compte : adresse email, mot de passe haché (bcrypt),
+profil et cible nutritionnelle, abonnements aux notifications push. Rien
+d'autre n'est collecté (pas d'analytics, pas de tiers). Supprimer un compte
+(`user.destroy` en console) efface en cascade son profil, sa cible et ses
+abonnements push.
 
 ## Démarrer en local
 
@@ -55,14 +103,6 @@ app/services/menu/week.rb                   planning, liste de courses, session 
 app/services/menu/calendar.rb               place une date dans la rotation
 ```
 
-Le solveur parcourt **toute** la grille des grammages admissibles au pas de 5 g plutôt
-que de résoudre un système linéaire : l'espace est assez petit pour ça, et l'optimum
-est garanti même quand un levier sature sa borne — cas où une résolution linéaire
-produit des solutions absurdes (glucides à +46 g sur un seul plat).
-
-Les cibles sont des **minimums** : passer dessous est bien plus grave que dépasser,
-d'où la pénalité ×40 sur les écarts négatifs.
-
 ## Ce qui vient du pattern « Rails single-user PWA »
 
 Extrait de Move the Spark et réappliqué ici :
@@ -83,7 +123,7 @@ le successeur maintenu — même API, namespace `WebPush`.
 
 ## Notifications
 
-Deux rappels, diffusés à tous les appareils enregistrés :
+Deux rappels, diffusés à tous les appareils enregistrés d'un compte :
 
 | Job | Quand | Contenu |
 |---|---|---|
@@ -92,26 +132,10 @@ Deux rappels, diffusés à tous les appareils enregistrés :
 
 Clés VAPID dans les credentials chiffrés, sous `vapid:`.
 
-## Comptes et données personnelles
-
-Pas d'inscription publique : l'admin crée chaque compte via `users:invite`, le
-mot de passe est transmis hors ligne. Chaque compte a son propre profil
-(âge, poids, taille, activité, objectif) et sa propre cible nutritionnelle —
-donc son propre menu résolu, puisque les grammages dépendent de la cible.
-Les recettes, la rotation des 16 semaines et les tables de référence restent
-communes à tous les comptes : ce sont des données éditoriales, pas des données
-personnelles.
-
-Ce qui est stocké par compte : adresse email, mot de passe haché (bcrypt),
-profil et cible nutritionnelle, abonnements aux notifications push. Rien
-d'autre n'est collecté (pas d'analytics, pas de tiers). Supprimer un compte
-(`user.destroy` en console) efface en cascade son profil, sa cible et ses
-abonnements push.
-
 ## Déploiement
 
-**Rien n'est déployé.** `config/deploy.yml` est un gabarit : domaine, IP et compte de
-registre restent à remplir. Ne pas lancer `bin/kamal setup` avant d'avoir choisi le
-domaine, pointé son DNS, et démarré le démon Docker — Kamal construit l'image localement.
+En ligne sur un VPS Hetzner via [Kamal](https://kamal-deploy.org) (même serveur que
+Move the Spark), image poussée sur `ghcr.io`, SQLite et Active Storage sur un volume
+Docker persistant. SSL automatique (Let's Encrypt) via le proxy de Kamal.
 
-Point ouvert avant toute mise en ligne : **la sauvegarde hors serveur** du volume SQLite.
+Point ouvert : **la sauvegarde hors serveur** du volume SQLite.
