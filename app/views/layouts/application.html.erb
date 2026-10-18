@@ -45,12 +45,11 @@
       else
         [ nil, nil, false, true ]
       end
-    # Session (mode Cuisine), Fiche plat et Les 16 semaines (mode Lecture) et Cibles
-    # (mode Réglages) portent leur propre en-tête mobile — le bandeau sticky partagé
-    # ne doit pas s'afficher par-dessus. Profil reste sur l'ancien bandeau pour l'instant :
-    # il partage le mode Réglages mais n'a pas encore reçu son propre en-tête de remplacement.
+    # Session (mode Cuisine), Fiche plat et Les 16 semaines (mode Lecture), Cibles et
+    # Profil (mode Réglages) portent leur propre en-tête mobile — le bandeau sticky
+    # partagé ne doit pas s'afficher par-dessus.
     suppress_mobile_header = in_session || on_dish || (controller_name == "weeks" && action_name == "index") ||
-                              controller_name == "nutrition_targets"
+                              controller_name == "nutrition_targets" || controller_name == "profiles"
     # Session garde la barre d'onglets (variante sombre) ; Les 16 semaines et Cibles
     # la perdent (mode Lecture-accueil / Réglages, voir plus bas).
     show_tab_bar = in_week || on_dish
