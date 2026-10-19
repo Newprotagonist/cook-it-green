@@ -19,6 +19,14 @@ gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# Pin below 3.x: JSON.parse there dropped the positional `options` argument
+# that ActiveSupport::JSON.decode (8.1.3.1) still passes — breaks signed
+# cookie verification outright (ArgumentError, not a warning) the moment a
+# real signed cookie has to be read back, not just written. jwt (pulled in
+# by web-push) doesn't pin json itself, so bundler happily resolves 3.x
+# without this.
+gem "json", "~> 2.21"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
 
