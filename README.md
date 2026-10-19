@@ -1,15 +1,19 @@
 # Cook It Green
 
+[![CI](https://github.com/Newprotagonist/cook-it-green/actions/workflows/ci.yml/badge.svg)](https://github.com/Newprotagonist/cook-it-green/actions/workflows/ci.yml)
+
 Menu vegan annuel calibré au gramme, en batch cooking : 16 semaines de rotation,
 48 plats, une session de cuisine de 3 h par semaine. Un solveur détermine le
 grammage exact de chaque recette pour atteindre des cibles nutritionnelles
 personnelles — l'app résout un vrai problème de contraintes, pas un simple
-calendrier de recettes.
-
-**En ligne :** [cookitgreen.com](https://cookitgreen.com) — PWA multi-utilisateur,
-sur invitation uniquement.
+calendrier de recettes. Conçue et développée seul, du produit à l'infra — en
+prod depuis septembre 2026 sur [cookitgreen.com](https://cookitgreen.com),
+PWA multi-utilisateur, sur invitation uniquement.
 
 ![Connexion](docs/screenshots/connexion.jpg)
+
+*(Captures prises avec le compte de seed local, aux données factices — voir
+`db/seeds.rb`.)*
 
 ## Le principe
 
@@ -72,6 +76,11 @@ d'autre n'est collecté (pas d'analytics, pas de tiers). Supprimer un compte
 (`user.destroy` en console) efface en cascade son profil, sa cible et ses
 abonnements push.
 
+## Prérequis
+
+- Ruby (voir `.ruby-version`)
+- Pas de base de données externe : tout tourne sur SQLite (fichiers dans `storage/`)
+
 ## Démarrer en local
 
 ```bash
@@ -132,6 +141,16 @@ Deux rappels, diffusés à tous les appareils enregistrés d'un compte :
 
 Clés VAPID dans les credentials chiffrés, sous `vapid:`.
 
+## Tests
+
+```bash
+bin/rails test           # modèle / service / contrôleur
+bin/rails test:system    # système (Capybara + Chrome headless)
+```
+
+Même suite exécutée en CI sur chaque push/PR ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)),
+avec rubocop, brakeman, bundler-audit et importmap audit en plus.
+
 ## Déploiement
 
 En ligne sur un VPS Hetzner via [Kamal](https://kamal-deploy.org) (même serveur que
@@ -139,3 +158,9 @@ Move the Spark), image poussée sur `ghcr.io`, SQLite et Active Storage sur un v
 Docker persistant. SSL automatique (Let's Encrypt) via le proxy de Kamal.
 
 Point ouvert : **la sauvegarde hors serveur** du volume SQLite.
+
+## Stack
+
+Rails 8 (authentification via le générateur intégré — pas de Devise), SQLite, Solid
+Queue (jobs planifiés, zéro infra supplémentaire), Tailwind CSS, Turbo + Stimulus
+(pas de framework JS séparé), gem `web-push` pour les notifications Web Push.
