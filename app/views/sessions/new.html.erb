@@ -12,12 +12,14 @@
 
   <%= form_with url: session_path, class: "space-y-4" do |f| %>
     <div>
-      <label class="mb-1.5 block text-[11px] font-bold uppercase tracking-widest text-chloro-300">Identifiant</label>
+      <%= f.label :email_address, "Identifiant",
+            class: "mb-1.5 block text-[11px] font-bold uppercase tracking-widest text-chloro-300" %>
       <%= f.email_field :email_address, required: true, autofocus: true, autocomplete: "username",
             class: "w-full rounded-lg border-0 bg-chloro-900 px-4 py-3 text-[15px] text-white placeholder:text-chloro-400 focus:outline focus:outline-2 focus:outline-zest-400" %>
     </div>
     <div>
-      <label class="mb-1.5 block text-[11px] font-bold uppercase tracking-widest text-chloro-300">Mot de passe</label>
+      <%= f.label :password, "Mot de passe",
+            class: "mb-1.5 block text-[11px] font-bold uppercase tracking-widest text-chloro-300" %>
       <%= f.password_field :password, required: true, autocomplete: "current-password",
             class: "w-full rounded-lg border-0 bg-chloro-900 px-4 py-3 text-[15px] text-white placeholder:text-chloro-400 focus:outline focus:outline-2 focus:outline-zest-400" %>
     </div>

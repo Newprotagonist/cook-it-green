@@ -67,13 +67,17 @@
           <%= link_to "Profil & besoins", profile_path, class: "hover:text-white" %>
           <%= link_to "Cibles", nutrition_target_path, class: "hover:text-white" %>
         </div>
-        <% if (t = current_user&.nutrition_target) %>
-          <span class="ml-auto text-xs tabular-nums text-zest-400">
-            <%= kcal t.floor_kcal %> kcal ·
-            P<%= t.protein.to_i %> L<%= t.lipid.to_i %> G<%= t.carb.to_i %> F<%= t.fiber.to_i %>
-            <% unless t.resolved? %><span class="text-amber-300">· non résolue</span><% end %>
-          </span>
-        <% end %>
+        <span class="ml-auto flex items-center gap-5">
+          <% if (t = current_user&.nutrition_target) %>
+            <span class="text-xs tabular-nums text-zest-400">
+              <%= kcal t.floor_kcal %> kcal ·
+              P<%= t.protein.to_i %> L<%= t.lipid.to_i %> G<%= t.carb.to_i %> F<%= t.fiber.to_i %>
+              <% unless t.resolved? %><span class="text-amber-300">· non résolue</span><% end %>
+            </span>
+          <% end %>
+          <%= button_to "Déconnexion", session_path, method: :delete,
+                class: "text-sm text-chloro-100 hover:text-white" %>
+        </span>
       </nav>
     </header>
 

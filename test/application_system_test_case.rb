@@ -14,12 +14,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def sign_in(user, password: "password")
     visit new_session_path
-    # Le formulaire de connexion a des <label> statiques, sans `for` et sans
-    # envelopper le champ (voir app/views/sessions/new.html.erb) : pas
-    # d'association programmatique, donc fill_in doit cibler le name/id Rails
-    # plutôt que le texte du label.
-    fill_in "email_address", with: user.email_address
-    fill_in "password", with: password
+    fill_in "Identifiant", with: user.email_address
+    fill_in "Mot de passe", with: password
     click_button "Se connecter"
     # Le redirect après connexion passe par Turbo (async) — attendre que le
     # formulaire ait disparu avant de continuer, sinon l'action suivante

@@ -9,20 +9,23 @@ class SessionsTest < ApplicationSystemTestCase
 
   test "un mauvais mot de passe reste sur l'écran de connexion avec une erreur" do
     visit new_session_path
-    fill_in "email_address", with: owner.email_address
-    fill_in "password", with: "mauvais mot de passe"
+    fill_in "Identifiant", with: owner.email_address
+    fill_in "Mot de passe", with: "mauvais mot de passe"
     click_button "Se connecter"
 
     assert_text "incorrect"
     assert_no_text "Seize semaines"
   end
 
-  test "se déconnecter revient à l'écran de connexion" do
-    # Le bouton Déconnexion ne vit que dans le menu Réglages mobile (lg:hidden) —
-    # il n'existe actuellement aucun contrôle de déconnexion sur le header
-    # desktop. On redimensionne la fenêtre pour exercer ce chemin réel, puis on
-    # la restaure : Selenium réutilise la même fenêtre entre les tests, une
-    # taille qui fuit sur le test suivant masque du contenu desktop ailleurs.
+  test "se déconnecter (desktop) revient à l'écran de connexion" do
+    sign_in(owner)
+
+    click_button "Déconnexion"
+
+    assert_selector "input[type='password']"
+  end
+
+  test "se déconnecter (mobile) revient à l'écran de connexion" do
     page.driver.browser.manage.window.resize_to(390, 844)
     begin
       sign_in(owner)
@@ -37,6 +40,8 @@ class SessionsTest < ApplicationSystemTestCase
 
       assert_selector "input[type='password']"
     ensure
+      # Selenium réutilise la même fenêtre entre les tests : une taille qui
+      # fuit sur le test suivant masque du contenu desktop ailleurs.
       page.driver.browser.manage.window.resize_to(1400, 1400)
     end
   end
