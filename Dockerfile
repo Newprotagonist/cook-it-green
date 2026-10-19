@@ -31,8 +31,12 @@ ENV RAILS_ENV="production" \
 FROM base AS build
 
 # Install packages needed to build gems
+# libssl-dev: the `openssl` gem (pulled in by web-push's `jwt` dependency,
+# >= 3.0) needs OpenSSL's headers to compile its native extension — the
+# runtime .so alone (already present via curl's own TLS dependency) isn't
+# enough at build time.
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libvips libyaml-dev pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git libssl-dev libvips libyaml-dev pkg-config && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install application gems
