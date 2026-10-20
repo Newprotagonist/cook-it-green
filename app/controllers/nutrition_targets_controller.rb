@@ -23,6 +23,7 @@ class NutritionTargetsController < ApplicationController
 
     @target = current_user.nutrition_target || current_user.build_nutrition_target
     @target.update!(needs.target_attributes)
+    @target.ensure_default_meal_shares!
     redirect_to nutrition_target_path, notice: "Besoins appliqués à votre cible."
   end
 

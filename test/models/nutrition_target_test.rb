@@ -31,6 +31,24 @@ class NutritionTargetTest < SeededTestCase
     assert_in_delta expected, target.slot_target("dish")[:protein], 0.001
   end
 
+  test "ensure_default_meal_shares! dote une cible neuve d'une répartition valide" do
+    other = User.create!(email_address: "other@example.com", password: "password")
+    t = other.build_nutrition_target(kcal: 2000, protein: 120, lipid: 70, carb: 200, fiber: 25)
+    t.save!
+
+    t.ensure_default_meal_shares!
+
+    assert_equal 3, t.meal_shares.count
+    assert_equal [ 1, 2, 1 ], t.meal_shares.order(:position).pluck(:servings_per_day)
+    assert t.valid?
+  end
+
+  test "ensure_default_meal_shares! ne duplique rien sur une cible qui en a déjà" do
+    assert_no_difference -> { target.meal_shares.count } do
+      target.ensure_default_meal_shares!
+    end
+  end
+
   test "deux utilisateurs ont des cibles et des grammages résolus indépendants" do
     other = User.create!(email_address: "other@example.com", password: "password")
     other_target = other.build_nutrition_target(target.attributes.slice(

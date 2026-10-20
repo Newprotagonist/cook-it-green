@@ -4,6 +4,14 @@
 class NutritionTarget < ApplicationRecord
   MACROS = %i[protein lipid carb fiber].freeze
 
+  # Petit-déj et collation comptent pour une prise par jour, le plat pour
+  # deux (midi + soir) — structure fixe, partagée par tous les comptes.
+  DEFAULT_SLOTS = [
+    { slot: "breakfast", key: "petit_dej", servings_per_day: 1 },
+    { slot: "dish",      key: "plat",      servings_per_day: 2 },
+    { slot: "snack",     key: "collation", servings_per_day: 1 }
+  ].freeze
+
   belongs_to :user
   has_many :meal_shares, -> { order(:position) }, dependent: :destroy
   has_many :resolved_dishes, dependent: :destroy
@@ -40,6 +48,24 @@ class NutritionTarget < ApplicationRecord
 
   def macro_minimums
     { protein: protein.to_f, lipid: lipid.to_f, carb: carb.to_f, fiber: fiber.to_f }
+  end
+
+  # Sans répartition, slot_target (donc tout le solveur) n'a rien à lire —
+  # aucun écran ne crée de meal_shares, c'est donc à la cible de s'en doter
+  # elle-même la première fois qu'elle existe pour de vrai.
+  def ensure_default_meal_shares!
+    return if meal_shares.any?
+
+    fractions = self.class.default_fractions
+    DEFAULT_SLOTS.each_with_index do |s, position|
+      f = fractions.fetch(s[:key])
+      meal_shares.create!(slot: s[:slot], servings_per_day: s[:servings_per_day], position: position,
+                          protein_share: f["P"], lipid_share: f["L"], carb_share: f["G"])
+    end
+  end
+
+  def self.default_fractions
+    @default_fractions ||= JSON.parse(Rails.root.join("db/seeds/menu_definitions.json").read)["meta"]["fractions"]
   end
 
   private

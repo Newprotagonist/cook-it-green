@@ -127,26 +127,19 @@ owner.profile.update!(sex: "male", age: 35, weight_kg: 70, height_cm: 178,
                       goal: Goal.find_by(key: "perte"))
 
 # ---------------------------------------------------------------------- cibles
-FRACTIONS = DEF["meta"]["fractions"]
-MARGIN    = DEF["meta"]["marge"]
-SLOTS = [ [ "breakfast", "petit_dej", 1 ], [ "dish", "plat", 2 ], [ "snack", "collation", 1 ] ].freeze
-
 # Cible unique de l'utilisateur de dev (singleton par compte, comme Profile) :
-# seul le premier preset sert à l'initialiser.
+# seul le premier preset sert à l'initialiser. La répartition sur la journée
+# (meal_shares) suit le même chemin que pour un vrai compte invité — voir
+# NutritionTarget#ensure_default_meal_shares!.
 preset = DEF["presets"].first
 target = owner.nutrition_target || owner.build_nutrition_target
 target.assign_attributes(
   kcal: preset["cible"]["kcal"], protein: preset["cible"]["P"],
-  lipid: preset["cible"]["L"], carb: preset["cible"]["G"], fiber: preset["cible"]["F"],
-  protein_margin: MARGIN["P"], lipid_margin: MARGIN["L"], carb_margin: MARGIN["G"]
+  lipid: preset["cible"]["L"], carb: preset["cible"]["G"], fiber: preset["cible"]["F"]
 )
-target.save!(validate: false)
+target.save!
 target.meal_shares.destroy_all
-SLOTS.each_with_index do |(slot, source_key, servings), position|
-  f = FRACTIONS[source_key]
-  target.meal_shares.create!(slot: slot, servings_per_day: servings, position: position,
-                             protein_share: f["P"], lipid_share: f["L"], carb_share: f["G"])
-end
+target.ensure_default_meal_shares!
 target.reload.validate!
 say.("#{NutritionTarget.count} cible, #{MealShare.count} répartitions")
 
