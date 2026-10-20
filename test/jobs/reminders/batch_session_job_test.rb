@@ -17,6 +17,19 @@ class Reminders::BatchSessionJobTest < MenuTestCase
     assert_equal [ "https://push.example/ready" ], calls.map { |c| c[:endpoint] }
   end
 
+  test "le compte démo ne reçoit jamais de rappel" do
+    demo = build_resolved_user("demo@cookitgreen.app")
+    demo.update!(demo: true)
+    demo.push_subscriptions.create!(endpoint: "https://push.example/demo", p256dh_key: "a", auth_key: "b")
+
+    calls = []
+    WebPush.stub(:payload_send, ->(**kwargs) { calls << kwargs }) do
+      Reminders::BatchSessionJob.perform_now(Date.current)
+    end
+
+    assert_empty calls
+  end
+
   private
 
   def build_resolved_user(email)

@@ -7,6 +7,10 @@ production: &production
     class: Reminders::BatchSessionJob
     queue: default
     schedule: every saturday at 10am
+  demo_reset:
+    class: DemoResetJob
+    queue: default
+    schedule: every day at 4am
 
 development:
   <<: *production

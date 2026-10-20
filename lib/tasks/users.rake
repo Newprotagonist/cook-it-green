@@ -15,6 +15,7 @@ namespace :users do
     email_address = args.email_address.presence || abort("Usage: bin/rails \"users:reset_password[someone@example.com]\"")
 
     user = User.find_by(email_address: email_address) || abort("Aucun compte pour #{email_address}.")
+    abort "#{email_address} est le compte démo public : voir demo:create pour en changer le mot de passe." if user.demo?
     password = SecureRandom.alphanumeric(16)
     user.update!(password: password)
 

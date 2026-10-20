@@ -5,7 +5,7 @@ module Reminders
     queue_as :default
 
     def perform(date = Date.current)
-      User.find_each do |user|
+      User.not_demo.find_each do |user|
         target = user.nutrition_target
         next unless target&.resolved?
 
