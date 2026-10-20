@@ -23,6 +23,8 @@ module ApplicationHelper
 
   def grams(value) = "#{number_with_precision(value, precision: value.to_f % 1 == 0 ? 0 : 1)} g"
 
+  def macro_label(macro) = { protein: "protéines", lipid: "lipides", carb: "glucides", fiber: "fibres" }.fetch(macro)
+
   private
 
   def macro_key(label)

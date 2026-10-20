@@ -18,7 +18,7 @@
 <% if (short = @week.shortfalls).any? %>
   <p class="mb-6 rounded border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-900">
     <%= short.size %> journée(s) sous un minimum :
-    <%= short.map { |d| "#{d.name} (#{d.totals.shortfalls(@target.macro_minimums).join(', ')})" }.to_sentence %>.
+    <%= short.map { |d| "#{d.name} (#{d.totals.shortfalls(@target.macro_minimums).map { |m| macro_label(m) }.join(', ')})" }.to_sentence %>.
   </p>
 <% end %>
 
